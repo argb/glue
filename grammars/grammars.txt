@@ -1,0 +1,32 @@
+这门语言的特点：
+1、一切皆为表达式，一切皆可计算
+2、一切类型都是衍生自Object这个超级父类，也就是一切类型皆对象
+========================================================
+
+函数字面量:
+fn <parameters> <block statement>
+<parameters> ::= (<parameter one>, <parameter two>, <parameter three>, ...)|空
+
+函数调用表达式：
+<expression>(<comma separated expressions>)
+例子:
+add(1,2)
+add()
+
+if语句:
+if (<expression>) <consequence> else <alternative>
+<consequence> ::= <block statement>
+<alternative> ::= <block statement> | 空
+
+目前存在一些设计问题：
+1、if语句，既是表达式也是语句，双重属性，对求值阶段(evaluate)的逻辑有影响。
+2、parser上挂了一个存储所有语句节点的数组p.statements, 这里也有问题，因为语句是存在嵌套的，
+而这个数组是个拉平了的语句数组，这导致存在重复的ast语句节点，如果试图通过遍历这个数组的方式来
+解析整个源程序的AST，那么所有嵌套在内部的节点都会重复解析。
+
+字符串：
+<sequence of characters>
+
+数组：
+[<expression list>]
+<expression list> := <expression>,<expression list>|ε
