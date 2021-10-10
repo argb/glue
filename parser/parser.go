@@ -93,6 +93,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
+	p.registerPrefix(token.LBRACE, p.parseHashLiteral2)
 
 	p.infixParseFns	  = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -107,6 +108,56 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 
 	return p
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	hash := &ast.HashLiteral{Token: p.curToken}
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+		key := p.parseExpression(LOWEST)
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		p.nextToken()
+		value := p.parseExpression(LOWEST)
+		hash.Pairs[key] = value
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
+		}
+	}
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+	return hash
+}
+
+func (p *Parser) parseHashLiteral2() ast.Expression {
+	hash := &ast.HashLiteral{Token: p.curToken}
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+
+	if p.expectPeek(token.RBRACE) {
+		return hash
+	}
+
+	label:
+		p.nextToken()
+		key := p.parseExpression(LOWEST)
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		p.nextToken()
+		value := p.parseExpression(LOWEST)
+		hash.Pairs[key] = value
+	if p.expectPeek(token.COMMA) {
+		goto label
+	}else if p.expectPeek(token.RBRACE) {
+		return hash
+	}else {
+		return nil
+	}
+
+	//return hash
 }
 
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
@@ -160,9 +211,37 @@ func (p *Parser) peekError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+func (p *Parser) curTokenIs(t token.TokenType) bool {
+	return p.curToken.Type == t
+}
+
+/**
+向前看一步
+ */
+func (p *Parser) peekTokenIs(t token.TokenType) bool {
+	return p.peekToken.Type == t
+}
+
+/**
+向前走一步
+*/
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+}
+
+/*
+向前看一步，符合预期就向前走一步，否则原地不动, 可以看做向前看与向前走的合体逻辑
+ */
+func (p *Parser) expectPeek(t token.TokenType) bool {
+	if p.peekTokenIs(t){
+		p.nextToken()
+		return true
+	}else {
+		// 这个报错信息主要是开始测试用例使用过，现在不应该有了，因为不算是个错误，只是个判断封装
+		//p.peekError(t)
+		return false
+	}
 }
 
 func (p *Parser) ParseProgram() *ast.Program {
@@ -307,23 +386,6 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	return stmt
 }
 
-func (p *Parser) curTokenIs(t token.TokenType) bool {
-	return p.curToken.Type == t
-}
-
-func (p *Parser) peekTokenIs(t token.TokenType) bool {
-	return p.peekToken.Type == t
-}
-
-func (p *Parser) expectPeek(t token.TokenType) bool {
-	if p.peekTokenIs(t){
-		p.nextToken()
-		return true
-	}else {
-		p.peekError(t)
-		return false
-	}
-}
 
 func (p *Parser) peekPrecedence() int {
 	if p, ok := precedences[p.peekToken.Type]; ok {

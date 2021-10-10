@@ -30,3 +30,6 @@ if (<expression>) <consequence> else <alternative>
 数组：
 [<expression list>]
 <expression list> := <expression>,<expression list>|ε
+
+哈希：
+{<expression> : <expression>, <expression> : <expression>, ... }
