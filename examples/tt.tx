@@ -12,3 +12,6 @@ iter(arr, []);
 let a = [1, 2, 3, 4];
 let double = fn(x) { x * 2 };
 map(a, double);
+
+a=10;
+while(a){ a=a-1;print(a);}

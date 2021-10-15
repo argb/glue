@@ -430,3 +430,80 @@ func (hl *HashLiteral) String() string {
 
 	return out.String()
 }
+
+type AssignStatement struct {
+	Token token.Token
+	Expressions [] Expression
+}
+
+func (as *AssignStatement) statementNode()  {
+
+}
+
+func (as *AssignStatement) TokenLiteral() string {
+	return as.Token.Literal
+}
+
+func (as *AssignStatement) String() string {
+	var out bytes.Buffer
+
+	for _, exp := range as.Expressions {
+		out.WriteString(exp.String())
+		out.WriteString(", ")
+	}
+	out.WriteString(";")
+	return out.String()
+}
+
+type AssignExpression struct {
+	Token token.Token
+	Name Expression
+	Operator string
+	Expression Expression
+}
+
+func (ae *AssignExpression) expressionNode() {
+
+}
+
+func (ae *AssignExpression) TokenLiteral() string {
+	return ae.Token.Literal
+}
+
+func (ae *AssignExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ae.Name.String())
+	out.WriteString(" "+ae.Operator+" ")
+	out.WriteString(ae.Expression.String())
+	out.WriteString(";")
+
+	return out.String()
+}
+
+type WhileStatement struct {
+	Token token.Token
+	Condition Expression
+	Body *BlockStatement
+}
+
+func (ws *WhileStatement) statementNode() {
+
+}
+
+func (ws *WhileStatement) TokenLiteral() string {
+	return ws.Token.Literal
+}
+
+func (ws *WhileStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ws.Token.Literal)
+	out.WriteString("( ")
+	out.WriteString(ws.Condition.String())
+	out.WriteString(" ) {\n")
+	out.WriteString(ws.Body.String())
+	out.WriteString("\n}")
+
+	return out.String()
+}

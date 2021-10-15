@@ -3,6 +3,25 @@
 2、一切类型都是衍生自Object这个超级父类，也就是一切类型皆对象
 ========================================================
 
+源程序-->语句-->表达式
+语句是不产生值的，而表达式可以。
+语句 := 表达式;|if 表达式 else 语句块;|等等
+语句的结束标志是分号（；），如果语句的解析开始之后，一直没有读取到分号，则视为非法语句。
+表达式语句（赋值语句）： 标志符 = 表达式;
+表达式语句不产生值，但是其中的表达式可以产生值，并赋值给左侧标志符。
+
+表达式种类：
+字面量表达式->数字，字符串，数组，哈希对象
+数学表达式
+函数调用表达式
+
+语句种类：
+声明语句
+赋值语句
+if语句
+return语句
+do while循环语句
+
 函数字面量:
 fn <parameters> <block statement>
 <parameters> ::= (<parameter one>, <parameter two>, <parameter three>, ...)|空
@@ -33,3 +52,15 @@ if (<expression>) <consequence> else <alternative>
 
 哈希：
 {<expression> : <expression>, <expression> : <expression>, ... }
+
+声明语句：
+let <identifier>;
+
+赋值语句：
+identifier = <expression>;
+
+todo:
+1、支持三元表达，可通过if表达式改造而来
+2、去掉if表达式，改为if语句
+3、统一规划处理：';'作为语句的结束符，必须。
+表达式后边不跟';'就是单纯的表达式，跟了';'就视为表达式语句。

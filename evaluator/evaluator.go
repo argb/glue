@@ -4,6 +4,7 @@ import (
 	"compiler01/ast"
 	"compiler01/object"
 	"fmt"
+	"reflect"
 )
 
 var (
@@ -41,6 +42,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalInfixExpression(node.Operator, left, right)
+	case *ast.AssignExpression:
+		val := Eval(node.Expression, env)
+		if isError(val) {
+			return val
+		}
+		if val==nil || reflect.ValueOf(val).IsNil() {
+			val = &object.Null{}
+		}
+
+		env.Set(node.Name.String(), val)
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
 	case *ast.IfExpression:
@@ -51,6 +62,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		val := Eval(node.Value, env)
 		if isError(val) {
 			return val
+		}
+		if val==nil || reflect.ValueOf(val).IsNil() {
+			val = &object.Null{}
 		}
 		env.Set(node.Name.Value, val)
 	case *ast.Identifier:
@@ -94,9 +108,48 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
+	case *ast.WhileStatement:
+		return evalWhileStatement(node,env)
 	}
 	return nil
 	//return newError("No valid ast node to evaluate")
+}
+
+func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) object.Object {
+	var MAX = 1024
+	for {
+		condition := Eval(node.Condition, env)
+		if isError(condition) {
+			return condition
+		}
+		if isTruthy(condition) {
+			result := Eval(node.Body, env)
+			if isFromReturnStatement(result) {
+				return result
+			}
+		}else {
+			break
+		}
+		// 临时保护机制，避免因为语言本身的解析bug导致用户程序的死循环，语言稳定后要去掉
+		if MAX>0 {
+			MAX--
+		}
+		if MAX == 0 {
+			fmt.Println("循环达到安全上限1024，被解释器强制退出，有死循环bug？")
+			break
+		}
+	}
+	return NULL
+}
+
+func isFromReturnStatement(result object.Object) bool {
+	if result != nil {
+		rt := result.Type()
+		if rt == object.RETURN_VALUE_OBJ || rt == object.ERROR_OBJ{
+			return true
+		}
+	}
+	return false
 }
 
 func evalHashLiteral(node *ast.HashLiteral, env *object.Environment) object.Object {
@@ -288,6 +341,10 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 }
 
 func isTruthy(obj object.Object) bool {
+
+	if obj.Type() == object.INTEGER_OBJ && obj.(*object.Integer).Value == 0 {
+		return false
+	}
 	switch obj {
 	case NULL:
 		return false
@@ -295,6 +352,7 @@ func isTruthy(obj object.Object) bool {
 		return true
 	case FALSE:
 		return false
+
 	default:
 		return true
 	}

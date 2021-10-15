@@ -5,6 +5,7 @@ import (
 	"compiler01/lexer"
 	"compiler01/token"
 	"fmt"
+	"reflect"
 	"strconv"
 )
 
@@ -13,6 +14,7 @@ import (
 const (
 	_ int = iota
 	LOWEST
+	ASSIGN
 	EQUALS // ==
 	LESSGREATER // > or <
 	SUM // +
@@ -23,6 +25,7 @@ const (
 )
 
 var precedences = map[token.TokenType]int{
+	token.ASSIGN: ASSIGN,
 	token.EQ: EQUALS,
 	token.NOT_EQ: EQUALS,
 	token.LT: LESSGREATER,
@@ -106,8 +109,38 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+	p.registerInfix(token.ASSIGN, p.parseAssignExpression)
 
 	return p
+}
+
+func (p *Parser) parseWhileStatement() *ast.WhileStatement {
+	stmt := &ast.WhileStatement{Token: p.curToken}
+	if p.expectPeek(token.LPAREN) {
+		p.nextToken()
+		stmt.Condition = p.parseExpression(LOWEST)
+	}else{
+		return nil
+	}
+
+	if !p.expectPeek(token.RPAREN) {
+		//p.peekError(token.RPAREN)
+		return nil
+	}
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	stmt.Body = p.parseBlockStatement()
+	return stmt
+}
+
+func (p* Parser) parseAssignExpression(left ast.Expression) ast.Expression {
+	assign := &ast.AssignExpression{Token:p.curToken, Name: left, Operator: p.curToken.Literal}
+
+	p.nextToken()
+	assign.Expression = p.parseExpression(LOWEST)
+
+	return assign
 }
 
 func (p *Parser) parseHashLiteral() ast.Expression {
@@ -244,14 +277,25 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	}
 }
 
+// ParseProgram /**
+/**
+Parser执行语法解析的入口方法
+ */
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = [] ast.Statement{}
 
 	for !p.curTokenIs(token.EOF) {
 		stmt := p.parseStatement()
-		if stmt != nil {
+		if stmt != nil && !reflect.ValueOf(stmt).IsNil(){
+			//fmt.Printf("I am not nil, my value type is:%T,\n my value is %#v\n", stmt, stmt)
+			//fmt.Printf("I am not nil, my value type is:%T,\n my value is %#v\n", stmt, stmt)
+			//fmt.Println("I am nil", stmt)
+
+			//fmt.Printf("I am not nil, I am %#v,my value is %s",stmt, stmt.String())
 			program.Statements = append(program.Statements, stmt)
+		}else{
+			fmt.Println("I am nil", stmt)
 		}
 		p.nextToken()
 	}
@@ -264,9 +308,32 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	//case token.IDENT:
+		//return p.parseAssignStatement()
+	case token.WHILE:
+		return p.parseWhileStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseAssignStatement() *ast.AssignStatement {
+	stmt := &ast.AssignStatement{Token: p.curToken}
+	/*
+	left := p.parseIdentifier()
+	as := p.parseAssignExpression(left)
+
+	if p.peekTokenIs(token.ASSIGN) {
+		p.nextToken()
+		p.nextToken()
+		stmt.Expression = p.parseExpression(LOWEST)
+	}
+
+	if !p.expectPeek(token.SEMICOLON) {
+		return nil
+	}
+	 */
+	return stmt
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
@@ -284,6 +351,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
 	fmt.Printf("token:%#v, token-literal:%s\n", t, p.curToken.Literal)
+	fmt.Println(msg)
 	p.errors = append(p.errors, msg)
 }
 
@@ -373,9 +441,19 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
-	if !p.expectPeek(token.ASSIGN) {
+	if !p.peekTokenIs(token.ASSIGN) {
+		if p.peekTokenIs(token.SEMICOLON) { // 此处看做是声明 let a;用户没有赋值。
+			stmt.Value = nil
+			p.nextToken()
+			p.nextToken()
+
+			return stmt
+		}
+		//fmt.Println("从这里返回了")
 		return nil
 	}
+
+	p.nextToken()
 	p.nextToken()
 	stmt.Value = p.parseExpression(LOWEST)
 

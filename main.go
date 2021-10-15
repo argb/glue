@@ -7,20 +7,26 @@ import (
 	"compiler01/object"
 	"compiler01/parser"
 	"compiler01/repl"
+	"encoding/binary"
 	"flag"
 	"fmt"
+	"github.com/fatih/color"
 	"io"
 	"os"
 	user2 "os/user"
+	"reflect"
 	"strings"
 )
 
 func main() {
+	//fmt.Println((*int)(nil) == (*int)(nil))
 	user, err := user2.Current()
 	if err != nil {
 		panic(err)
 	}
-tt()
+	//t1()
+	//ttt()
+//tt()
 	/*
 	f := flag.String("src", "", "source file")
 	flag.Parse()
@@ -28,9 +34,11 @@ tt()
 	 */
 
 	//terminal.Set(terminal.FG_GREEN)
-	fmt.Printf("Hello %s! This is the Monkey programming language!\n", user.Username)
+	color.Set(color.FgMagenta)
+	fmt.Printf("你好 %s! 吃了吗？\n", user.Username)
 	//terminal.Unset()
-	fmt.Printf("Feel free to type in commands\n")
+	fmt.Printf("欢迎使用【Go艹】语言！\n")
+	color.Unset()
 
 	//terminal.TT()
 	repl.Start(os.Stdin, os.Stdout)
@@ -134,4 +142,65 @@ func xx(i P) interface{} {
 	p.say()
 
 	return p
+}
+
+type Animal interface {
+	walk()
+}
+type Dog struct {
+	Name string
+}
+
+func (d Dog)walk()  {
+	fmt.Println("I can walk")
+}
+
+func getNilDog() *Dog {
+	return nil
+}
+
+func getNilNilDog() Animal {
+	return getNilDog()
+}
+
+func ttt() {
+	//var empty interface{}
+	//var emptyDog Dog
+	//fmt.Println(emptyDog==nil) // 无法通过编译
+
+	//nilDog := getNilDog() // 编译时类型检查无法给出提示
+	nilDog := getNilNilDog()
+	fmt.Printf("I am a not existed dog %#v\n", nilDog)
+	fmt.Println("the judge value is", nilDog == nil)
+	if nilDog != nil {
+		println("I want to say:I am not nil.")
+	}
+	//var d Dog
+	var dp *Dog
+	idp :=Animal(dp)
+	fmt.Println(dp ==nil,idp==nil, reflect.ValueOf(idp).IsNil(), reflect.ValueOf(dp).IsNil())
+	//var i Dog
+	p := (*int)(nil)
+	fmt.Println(reflect.ValueOf(p).Elem().IsValid())
+
+	num :=0
+	{
+		var num = 9
+		num =10
+		num, n:= secret()
+		fmt.Println(num, n)
+	}
+	fmt.Println("the value of num:", num)
+
+}
+func secret() (int,int) {
+	return 100, 200
+}
+
+func t1() {
+	var a = []int { 1,2,3,4,5}
+	b := a[2:4]
+	var b1 = make([]byte, 2)
+	 binary.BigEndian.PutUint16(b1, uint16(65534))
+	fmt.Println(b,b1,byte(b1[0]))
 }

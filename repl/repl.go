@@ -2,10 +2,10 @@ package repl
 
 import (
 	"bufio"
-	"compiler01/evaluator"
+	"compiler01/compiler"
 	"compiler01/lexer"
-	"compiler01/object"
 	"compiler01/parser"
+	"compiler01/vm"
 	"fmt"
 	"github.com/fatih/color"
 	"io"
@@ -17,7 +17,7 @@ const POEM = `
 `
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
-	env := object.NewEnvironment()
+	//env := object.NewEnvironment()
 
 	color.Green(POEM)
 
@@ -48,6 +48,7 @@ func Start(in io.Reader, out io.Writer) {
 		io.WriteString(out, "\n")
 		color.Unset()
 
+		/*
 		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			color.Set(color.FgMagenta)
@@ -56,6 +57,28 @@ func Start(in io.Reader, out io.Writer) {
 			io.WriteString(out, "\n")
 			color.Unset()
 		}
+		 */
+
+		comp :=compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+			continue
+		}
+
+		machine := vm.New(comp.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+			continue
+		}
+
+		lastPopped := machine.LastPoppedStackElem()
+		io.WriteString(out, lastPopped.Inspect())
+		io.WriteString(out, "\n")
+
+		machine.ShowReadableInstructions()
+		machine.ShowReadableConstants()
 
 		/*
 		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken(){

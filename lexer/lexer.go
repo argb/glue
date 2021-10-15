@@ -87,7 +87,7 @@ func (l *Lexer) NextToken() token.Token {
 		//fmt.Println("xxxxx")
 		tok.StartChar = '"'
 		tok.Type = token.STRING
-		tok.Literal = l.readString()
+		tok.Literal = l.readString2(&tok)
 	case '[':
 		tok = newToken(token.LBRACKET, l.ch)
 	case ']':
