@@ -22,6 +22,7 @@ type Compiler struct {
 	constants []object.Object
 	lastInstruction EmittedInstruction
 	previousInstruction EmittedInstruction
+	symbolTable *SymbolTable
 }
 
 func New() *Compiler {
@@ -30,6 +31,7 @@ func New() *Compiler {
 		constants: []object.Object{},
 		lastInstruction: EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
+		symbolTable: NewSymbolTable(),
 	}
 }
 
@@ -42,6 +44,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 				return err
 			}
 		}
+	case *ast.LetStatement:
+		err := c.Compile(node.Value)
+		if err != nil {
+			return err
+		}
+		symbol := c.symbolTable.Define(node.Name.Value)
+		c.emit(code.OpSetGlobal, symbol.Index)
 	case *ast.ExpressionStatement:
 		err := c.Compile(node.Expression)
 		if err != nil {
@@ -108,6 +117,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 		//9999这里只是个随意占位符，小于65535就可以，因为操作数目前设置宽度为2字节，超出2字节会导致指令对齐出错
+		// if not true, jump over the consequence block
 		jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
 		err = c.Compile(node.Consequence)
 		if err != nil {
@@ -117,16 +127,16 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if c.lastInstructionIsPop() {
 			c.removeLastPop()
 		}
+
+		// jump over the alternative block
+		jumpPos := c.emit(code.OpJump, 9999)
+
 		afterConsequencePos := len(c.instructions)
 		c.changeOperand(jumpNotTruthyPos, afterConsequencePos)
 
 		if node.Alternative == nil {
-			afterConsequencePos := len(c.instructions)
-			c.changeOperand(jumpNotTruthyPos, afterConsequencePos)
+			c.emit(code.OpNull)
 		}else {
-			jumpPos := c.emit(code.OpJump, 9999)
-			afterConsequencePos := len(c.instructions)
-			c.changeOperand(jumpNotTruthyPos, afterConsequencePos)
 
 			err := c.Compile(node.Alternative)
 			if err != nil {
@@ -136,9 +146,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 			if c.lastInstructionIsPop() {
 				c.removeLastPop()
 			}
-			afterAlternativePos := len(c.instructions)
-			c.changeOperand(jumpPos, afterAlternativePos)
 		}
+
+		afterAlternativePos := len(c.instructions)
+		c.changeOperand(jumpPos, afterAlternativePos)
 	case *ast.BlockStatement:
 		for _, s := range node.Statements {
 			err := c.Compile(s)
@@ -155,6 +166,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}else {
 			c.emit(code.OpFalse)
 		}
+	case *ast.Identifier:
+		symbol, ok := c.symbolTable.Resolve(node.Value)
+		if !ok {
+			return fmt.Errorf("undefined variable %s", node.Value)
+		}
+		c.emit(code.OpGetGlobal, symbol.Index)
 	}
 	return nil
 }

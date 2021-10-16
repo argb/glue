@@ -139,6 +139,7 @@ func TestBooleanExpressions(t *testing.T) {
 		{"!!true", true},
 		{"!!false", false},
 		{"!!5", true},
+		{"!(if (false) { 5; })", true},
 	}
 	runVmTests(t, tests)
 }
@@ -154,6 +155,11 @@ func TestConditionals(t *testing.T) {
 		{"if (1 > 2) { 10 } else { 20 }", 20},
 		{"if (1 > 2) { 10 }", Null},
 		{"if (false) { 10 }", Null},
+		// 这种情况的结果是内层表达式产生了一个null值
+		//非常垃圾的语法，可读性非常差，if表达式必须去掉，只能用if语句，if表达式的等价效果用三元表达式表示，虽然本质上一样，
+		//但是应该从概念上把表达式和语句分开，否则容易引起理解和使用的混乱
+		{"if ((if (false) { 10 })) { 10 } else { 20 }", 20},
+
 	}
 	runVmTests(t, tests)
 }

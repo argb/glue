@@ -14,6 +14,18 @@ var True = &object.Boolean{Value: true}
 var False = &object.Boolean{Value: false}
 var Null = &object.Null{}
 
+type StackItem []byte
+
+// StackMonitor /**
+/*
+用来监控VM stack的数据结构，用于记录stack在每条指令执行之后的运行状态
+ */
+type StackMonitor struct {
+	Len int64
+	Sp int64
+	CurItems []StackItem
+}
+
 type VM struct {
 	constants [] object.Object
 	instructions code.Instructions
@@ -120,13 +132,19 @@ func (vm *VM) Run() error {
 			//会自动令ip增加1，否则就多走了一步
 			ip = pos - 1
 		case code.OpJumpNotTruthy:
+			//跳转偏移量是在编译时确定的，通过back-patching的方式把偏移量回填到占位指令上
 			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
 			ip += 2 // 跟OpConstant指令的处理相同，跳过操作数占用的字节
 
 			condition := vm.pop()
-			// 因为此指令的作用是：条件不成立的时跳转，跳转是预期，所以进下面的流程并修改ip到目的地址才是符合预期的
+			// 因为此指令的作用是：条件不成立的时跳转，条件成立就跳过本条指令，什么也不做，继续取后面的指令
 			if !isTruthy(condition) {
 				ip = pos -1
+			}
+		case code.OpNull:
+			err := vm.push(Null)
+			if err != nil {
+				return err
 			}
 		}
 
@@ -139,6 +157,8 @@ func isTruthy(obj object.Object) bool {
 	switch obj := obj.(type) {
 	case *object.Boolean:
 		return obj.Value
+	case *object.Null:
+		return false
 	default:
 		return true
 	}
@@ -164,6 +184,8 @@ func (vm *VM) executeBangOperator() error {
 	case True:
 		return vm.push(False)
 	case False:
+		return vm.push(True)
+	case Null:
 		return vm.push(True)
 	default:
 		return vm.push(False)
