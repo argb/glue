@@ -24,6 +24,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	//t10()
 	//t1()
 	//ttt()
 //tt()
@@ -203,4 +204,17 @@ func t1() {
 	var b1 = make([]byte, 2)
 	 binary.BigEndian.PutUint16(b1, uint16(65534))
 	fmt.Println(b,b1,byte(b1[0]))
+}
+func n(n int) int {
+	return n
+}
+
+type objk struct {
+	name string
+}
+type pair map[*objk]string
+func init() {
+	var m map[string]string
+	m = map[string]string{"name":"wg"}
+	fmt.Printf("m is %p",m)
 }

@@ -9,6 +9,7 @@ import (
 )
 
 const StackSize = 2048
+const GlobalSize = 65536
 
 var True = &object.Boolean{Value: true}
 var False = &object.Boolean{Value: false}
@@ -32,6 +33,8 @@ type VM struct {
 
 	stack []object.Object
 	sp int
+
+	globals []object.Object
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
@@ -41,7 +44,15 @@ func New(bytecode *compiler.Bytecode) *VM {
 
 		stack: make([]object.Object, StackSize),
 		sp :0,
+		globals: make([]object.Object, GlobalSize),
 	}
+}
+
+func NewWithGlobalsStore(bytecode *compiler.Bytecode, s []object.Object) *VM {
+	vm := New(bytecode)
+	vm.globals = s
+
+	return vm
 }
 
 func (vm *VM) ShowReadableInstructions() {
@@ -76,6 +87,8 @@ func (vm *VM) StackTop() object.Object {
 
 func (vm *VM) Run() error {
 	//VM进入运行状态，ip是指令指针，每次向前移动一个字节，
+	//每条指令的宽度可能不同，所以每条指令执行完后必须jump over合适的operands，如果碰到无法识别的指令，就会造成指令的执行出错，因为
+	//可能会导致IP指向操作数，会导致后续所有指令的执行不可预测，出一些奇怪的错误
 	for ip := 0; ip < len(vm.instructions); ip++ {
 		//取出当前ip指向的指令，指令长度一字节，直接强制类型转换为Opcode类型，不会有信息丢失
 		op := code.Opcode(vm.instructions[ip])
@@ -146,11 +159,121 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
-		}
+		case code.OpSetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
 
+			vm.globals[globalIndex] = vm.pop()
+		case code.OpGetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			err := vm.push(vm.globals[globalIndex])
+			if err != nil {
+				return err
+			}
+		case code.OpArray:
+			// OpArray 用来计算（构造）数组字面量，没错，数组的构造过程是在运行时进行的，因为数组每个元素可能是某个表达式的
+			// 计算结果，所以只能无法在编译期确定数组的具体元素内容
+			// 但是编译器可以做一些优化，比如对常量表达式直接算出结果，优化暂且不做，后续在再做
+			numElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+			//这里有个顺序，数组原始是根据指令的顺序执行压栈的，所以前面的元素会先压栈，因为指令先生成
+			array := vm.buildArray(vm.sp-numElements, vm.sp)
+			vm.sp = vm.sp - numElements // 数组构造完成后让栈指针下移数组长度的距离，代表数组出栈了
+
+			err := vm.push(array) // 把构造好的数组对象压栈
+			if err != nil {
+				return err
+			}
+		case code.OpHash:
+			numElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+			hash, err := vm.buildHash(vm.sp-numElements, vm.sp)
+			if err != nil {
+				return err
+			}
+			vm.sp = vm.sp - numElements
+			err = vm.push(hash)
+			if err != nil {
+				return err
+			}
+		case code.OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+
+			err := vm.executeIndexExpression(left, index)
+			if err != nil {
+				return err
+			}
+
+		}
 	}
 
 	return nil
+}
+
+func (vm *VM) executeIndexExpression(left, index object.Object) error {
+	switch {
+	case left.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
+		return vm.executeArrayIndex(left, index)
+	case left.Type() == object.HASH_OBJ:
+		return vm.executeHashIndex(left, index)
+	default:
+		return fmt.Errorf("index operator not supported: %s", left.Type())
+	}
+}
+
+func (vm *VM) executeArrayIndex(array, index object.Object) error {
+	arrayObject := array.(*object.Array)
+	i := index.(*object.Integer).Value
+	max := int64(len(arrayObject.Elements) -1)
+	if i < 0 || i > max {
+		return vm.push(Null)
+	}
+
+	return vm.push(arrayObject.Elements[i])
+}
+
+func (vm *VM) executeHashIndex(hash, index object.Object) error {
+	hashObject := hash.(*object.Hash)
+	key, ok := index.(object.Hashable)
+	if !ok {
+		return fmt.Errorf("unusable as hash key: %s", index.Type())
+	}
+	pair, ok := hashObject.Pairs[key.HashKey()]
+	if !ok {
+		return vm.push(Null)
+	}
+
+	return vm.push(pair.Value)
+}
+
+func (vm *VM) buildHash(startIndex, endIndex int) (object.Object, error) {
+	hashedPairs := make(map[object.HashKey]object.HashPair)
+	for i:= startIndex; i< endIndex; i+=2 {
+		key :=vm.stack[i]
+		value := vm.stack[i+1]
+		pair := object.HashPair{Key: key, Value: value}
+
+		hashKey, ok := key.(object.Hashable)
+		if !ok {
+			return nil, fmt.Errorf("unusable as hash key: %s", key.Type())
+		}
+		hashedPairs[hashKey.HashKey()] = pair
+	}
+
+	return &object.Hash{Pairs: hashedPairs}, nil
+}
+
+func (vm *VM) buildArray(startIndex, endIndex int) object.Object {
+	elements := make([]object.Object, endIndex - startIndex)
+
+	for i:= startIndex; i < endIndex; i++ {
+		elements[i - startIndex] = vm.stack[i]
+	}
+
+	return &object.Array{Elements: elements}
 }
 
 func isTruthy(obj object.Object) bool {
@@ -223,9 +346,8 @@ func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object
 	default:
 		return fmt.Errorf("unknown operator: %d", op)
 	}
-
-	return nil
 }
+
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
 	if input {
@@ -241,11 +363,25 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 	leftType := left.Type()
 	rightType := right.Type()
 
-	if leftType == object.INTEGER_OBJ && rightType == object.INTEGER_OBJ {
+	switch {
+	case leftType == object.INTEGER_OBJ && rightType == object.INTEGER_OBJ:
 		return vm.executeBinaryIntegerOperation(op, left, right)
+	case leftType == object.STRING_OBJ && rightType == object.STRING_OBJ:
+		return vm.executeBinaryStringOperation(op, left, right)
+	default:
+		return fmt.Errorf("unsupported types for binary operation: %s, %s", leftType, rightType)
 	}
 
-	return fmt.Errorf("unsupported types for binary operation: %s, %s", leftType, rightType)
+}
+
+func (vm *VM) executeBinaryStringOperation(op code.Opcode, left, right object.Object) error {
+	if op != code.OpAdd {
+		return fmt.Errorf("unknown string operator: %d", op)
+	}
+	leftValue := left.(*object.String).Value
+	rightValue := right.(*object.String).Value
+	//好像go的+在处理字符串相加时效率较低，后续考虑优化一下。 todo:
+	return vm.push(&object.String{Value: leftValue + rightValue})
 }
 
 func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.Object) error {

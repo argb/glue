@@ -3,6 +3,7 @@ package object
 import (
 	"bytes"
 	"compiler01/ast"
+	"compiler01/code"
 	"fmt"
 	"hash/fnv"
 	"strings"
@@ -21,6 +22,7 @@ const (
 	BUILTIN_OBJ = "BUILTIN"
 	ARRAY_OBJ = "ARRAY"
 	HASH_OBJ = "HASH"
+	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 )
 
 type Object interface {
@@ -226,3 +228,14 @@ func (h *Hash) Inspect() string {
 	return out.String()
 }
 
+type CompiledFunction struct {
+	Instructions code.Instructions
+}
+
+func (cf *CompiledFunction) Type() ObjectType {
+	return COMPILED_FUNCTION_OBJ
+}
+
+func (cf *CompiledFunction) Inspect() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
+}

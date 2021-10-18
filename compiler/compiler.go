@@ -5,6 +5,7 @@ import (
 	"compiler01/code"
 	"compiler01/object"
 	"fmt"
+	"sort"
 )
 
 type Bytecode struct {
@@ -33,6 +34,14 @@ func New() *Compiler {
 		previousInstruction: EmittedInstruction{},
 		symbolTable: NewSymbolTable(),
 	}
+}
+
+func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
+	compiler := New()
+	compiler.symbolTable = s
+	compiler.constants = constants
+
+	return compiler
 }
 
 func (c *Compiler) Compile(node ast.Node) error {
@@ -172,10 +181,59 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("undefined variable %s", node.Value)
 		}
 		c.emit(code.OpGetGlobal, symbol.Index)
+	case *ast.StringLiteral:
+		str := &object.String{Value: node.Value}
+		c.emit(code.OpConstant, c.addConstant(str))
+	case *ast.ArrayLiteral:
+		for _, el := range node.Elements {
+			err := c.Compile(el)
+			if err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpArray, len(node.Elements))
+	case *ast.HashLiteral:
+		var keys []ast.Expression
+		for k := range node.Pairs{
+			keys = append(keys, k)
+		}
+		// go的range循环遍历map时不会保证顺序，顺是随机的，这里是为了便于写
+		// test cases, 即使不排序也不影响指令生成和vm的执行
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i].String() <keys[j].String()
+		})
+		for _, k := range keys {
+			err := c.Compile(k)
+			if err != nil {
+				return err
+			}
+			err = c.Compile(node.Pairs[k])
+			if err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpHash, len(node.Pairs)*2)
+	case *ast.IndexExpression:
+		err := c.Compile(node.Left)
+		if err != nil {
+			return err
+		}
+		err = c.Compile(node.Index)
+		if err != nil {
+			return err
+		}
+
+		c.emit(code.OpIndex)
 	}
 	return nil
 }
 
+/*
+编译时的不变量都加到这个常量池中，就是一块连续内存，借助go的数组来表示
+VM启动后会直接给VM使用,vm.constants
+因为vm的启动跟编译是连续的过程，所以vm可以直接使用编译过程开辟的这块内存
+如果需要把字节码导出，然后可以独立的作为vm的输入去执行的话，就需要额外处理这个常量池内存的分配问题
+ */
 func (c *Compiler) addConstant(obj object.Object) int {
 	c.constants = append(c.constants, obj)
 

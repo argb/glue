@@ -29,6 +29,10 @@ const (
 	OpNull
 	OpGetGlobal
 	OpSetGlobal
+	OpArray
+	OpHash
+	OpIndex
+	OpCall
 )
 
 type Definition struct {
@@ -37,7 +41,7 @@ type Definition struct {
 }
 
 var definitions = map[Opcode]*Definition{
-	OpConstant: {"OpConstant", []int{2}},
+	OpConstant: {"OpConstant", []int{2}}, // the operand is a index of literal value sitting on constant pool
 	OpAdd: {"OpAdd", []int{}},
 	OpPop: {"OpPop", []int{}},
 	OpSub: {"OpSub", []int{}},
@@ -50,11 +54,15 @@ var definitions = map[Opcode]*Definition{
 	OpGreaterThan: {"OpGreaterThan", []int{}},
 	OpMinus: {"OpMinus", []int{}},
 	OpBang: {"OpBang", []int{}},
-	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
-	OpJump: {"OpJump", []int{2}},
+	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}}, //the operand is the index of the target instruction
+	OpJump: {"OpJump", []int{2}}, // same with OpJumpNotTruthy
 	OpNull: {"OpNull", []int{}},
-	OpGetGlobal: {"OpGetGlobal", []int{2}},
+	OpGetGlobal: {"OpGetGlobal", []int{2}}, // the operand is the index of a value siting on a scope
 	OpSetGlobal: {"OpSetGlobal", []int{2}},
+	OpArray: {"OpArray", [] int{2}}, // the operand is the length of the array, which is used to build the array literal
+	OpHash: {"OpHash", []int{2}}, // same with OpHash
+	OpIndex: {"OpIndex", []int{}},
+	OpCall: {"OpCall", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
