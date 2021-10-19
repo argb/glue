@@ -213,8 +213,13 @@ type objk struct {
 	name string
 }
 type pair map[*objk]string
-func init() {
+func xxx() {
 	var m map[string]string
 	m = map[string]string{"name":"wg"}
-	fmt.Printf("m is %p",m)
+	fmt.Printf("m is %p\n",m)
+	i:=0
+	for i<3 {
+		i++
+		fmt.Println("i:", i)
+	}
 }

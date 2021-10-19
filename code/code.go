@@ -33,6 +33,10 @@ const (
 	OpHash
 	OpIndex
 	OpCall
+	OpReturnValue
+	OpReturn
+	OpGetLocal
+	OpSetLocal
 )
 
 type Definition struct {
@@ -63,6 +67,10 @@ var definitions = map[Opcode]*Definition{
 	OpHash: {"OpHash", []int{2}}, // same with OpHash
 	OpIndex: {"OpIndex", []int{}},
 	OpCall: {"OpCall", []int{}},
+	OpReturnValue: {"OpReturnValue", []int{}},
+	OpReturn: {"OpReturn", []int{}},
+	OpGetLocal: {"OpGetLocal", []int{1}}, //操作数宽度1字节，也就是说本地变量不能超过256个，一个函数里面应该不会写那么多变量吧
+	OpSetLocal: {"OpSetLocal", []int{1}},
 }
 
 func Lookup(op byte) (*Definition, error) {
@@ -93,6 +101,8 @@ func Make(op Opcode, operands ...int) []byte {
 		switch width {
 		case 2:
 			binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
+		case 1:
+			instruction[offset] = byte(o)
 		}
 		offset += width
 	}
@@ -104,7 +114,7 @@ func Make(op Opcode, operands ...int) []byte {
 /*
 这个参数ins可能需要调整，ins不应该是instructions，应该是oprands，现在是从指令序列里读取操作数，参数传进来要给出正确
 的指令的偏移位置，否则就出错，所以语义上有点乱，读取操作数就应该单纯的读取，不要考虑偏移，控制偏移就是专门的控制偏移，有单独的函数起个合适的
-函数名字来完成
+函数名字来完成，图省事，暂时先这样
 Todo: 后续要调整
  */
 func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
@@ -114,10 +124,16 @@ func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 		switch width {
 		case 2:
 			operands[i] = int(ReadUint16(ins[offset:]))
+		case 1:
+			operands[i] = int(ReadUint8(ins[offset:]))
 		}
 		offset += width
 	}
 	return operands, offset
+}
+
+func ReadUint8(ins Instructions) uint8 {
+	return uint8(ins[0])
 }
 
 func ReadUint16(ins Instructions) uint16 {

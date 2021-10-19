@@ -81,12 +81,16 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
+		machine.ShowReadableInstructions()
+		machine.ShowReadableConstants()
+		machine.ShowStack()
+		machine.ShowCallStack()
+
 		lastPopped := machine.LastPoppedStackElem()
 		io.WriteString(out, lastPopped.Inspect())
 		io.WriteString(out, "\n")
 
-		//machine.ShowReadableInstructions()
-		//machine.ShowReadableConstants()
+
 
 		/*
 		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken(){
