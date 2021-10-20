@@ -35,6 +35,10 @@ type Frame struct {
 	basePointer int
 }
 
+// NewFrame /**
+/*
+每个函数会对应一个栈帧，栈帧会存储函数的指令序列，调用前的执行栈sp值信息，函数调用结束后会用来恢复调用前的状态，继续执行主指令序列
+ */
 func NewFrame(fn *object.CompiledFunction, basePointer int) *Frame {
 	f := &Frame{
 		fn: fn,
@@ -240,7 +244,7 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
-		case code.OpSetGlobal:
+		case code.OpSetGlobal: //全局变量存在一个全局变量池中，实际上就是个go的切片，在整个程序运行的生命周期中都可以被访问
 			globalIndex := code.ReadUint16(instructions[ip+1:])
 			vm.currentFrame().ip += 2
 
@@ -253,7 +257,7 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
-		case code.OpSetLocal:
+		case code.OpSetLocal: //本地变量直接存在stack上，注意跟全局变量的处理不同，没有专门用一个数据结构存储，而是直接放在了stack上，随着函数调用结束会被销毁。
 			localIndex := code.ReadUint8(instructions[ip+1:])
 			vm.currentFrame().ip += 1
 
@@ -267,6 +271,15 @@ func (vm *VM) Run() error {
 			frame := vm.currentFrame()
 
 			err := vm.push(vm.stack[frame.basePointer+int(localIndex)])
+			if err != nil {
+				return err
+			}
+		case code.OpGetBuiltin:
+			builtinIndex := code.ReadUint8(instructions[ip+1:])
+			vm.currentFrame().ip += 1
+
+			definition := object.Builtins[builtinIndex]
+			err := vm.push(definition.Builtin)
 			if err != nil {
 				return err
 			}
@@ -305,13 +318,28 @@ func (vm *VM) Run() error {
 				return err
 			}
 		case code.OpCall:
-			fn, ok := vm.stack[vm.sp - 1].(*object.CompiledFunction)
+			numArgs := int(code.ReadUint8(instructions[ip+1:]))
+
+			vm.currentFrame().ip += 1
+			err := vm.executeCall(numArgs)
+			if err != nil {
+				return err
+			}
+			/*
+			// 参数arguments已经被加载到stack上了
+			fn, ok := vm.stack[vm.sp - 1 - numArgs].(*object.CompiledFunction)
 			if !ok {
 				return fmt.Errorf("calling non-function")
 			}
-			frame := NewFrame(fn, vm.sp)
-			vm.pushFrame(frame)
-			vm.sp = frame.basePointer + fn.NumLocals
+			if numArgs != fn.NumParameters {
+				return fmt.Errorf("wrong number of arguments: want=%d, got=%d", fn.NumParameters, numArgs)
+			}
+			frame := NewFrame(fn, vm.sp - numArgs)
+			vm.pushFrame(frame) // 下一轮循环，指令就切换到新栈帧下的指令序列
+			vm.sp = frame.basePointer + fn.NumLocals //sp增长NumLocals，形成一个stack hole空洞，用来加载函数的局部变量
+
+
+			 */
 		case code.OpReturnValue:
 			returnValue := vm.pop()
 
@@ -322,7 +350,7 @@ func (vm *VM) Run() error {
 			frame := vm.popFrame()
 			// 小优化， -1 代替之前的vm.pop, 一步到位，相当于直接把函数对象也从栈上移除了，函数对象哪来的？编译的时候绑定到函数名上的，所以
 			// 函数调用的上一条指令一定是OpGetGlobal或者OpGetLocal, 这是有编译器决定的
-			vm.sp = frame.basePointer - 1
+			vm.sp = frame.basePointer - 1 // 恢复函数调用前的sp位置
 
 			err := vm.push(returnValue)
 			if err != nil {
@@ -342,6 +370,50 @@ func (vm *VM) Run() error {
 
 	return nil
 }
+
+func (vm *VM) executeCall(numArgs int) error {
+	callee := vm.stack[vm.sp-1-numArgs]
+	switch callee := callee.(type) {
+	case *object.CompiledFunction:
+		return vm.callFunction(callee, numArgs)
+	case *object.Builtin:
+		return vm.callBuiltin(callee, numArgs)
+	default:
+		return fmt.Errorf("calling non-function and non-builtin")
+	}
+}
+
+func (vm *VM) callFunction(fn *object.CompiledFunction, numArgs int) error {
+	if numArgs != fn.NumParameters {
+		return fmt.Errorf("wrong number of arguments: want=%d, got=%d", fn.NumParameters, numArgs)
+	}
+	frame := NewFrame(fn, vm.sp - numArgs)
+	vm.pushFrame(frame)
+
+	vm.sp = frame.basePointer + fn.NumLocals
+
+	return nil
+}
+
+func (vm *VM) callBuiltin(builtin *object.Builtin, numArgs int) error {
+	args := vm.stack[vm.sp-numArgs : vm.sp]
+
+	result := builtin.Fn(args...)
+	vm.sp = vm.sp - numArgs -1
+	var err error
+	if result != nil {
+		err = vm.push(result)
+	}else {
+		err = vm.push(Null)
+	}
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 
 func (vm *VM) executeIndexExpression(left, index object.Object) error {
 	switch {

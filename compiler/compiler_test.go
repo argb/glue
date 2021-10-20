@@ -619,6 +619,7 @@ func TestFunctionCalls(t *testing.T) {
 				code.Make(code.OpCall),
 				code.Make(code.OpPop),
 			},
+
 		},
 		{
 			input: `
@@ -637,6 +638,100 @@ noArg();
 				code.Make(code.OpSetGlobal, 0),
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpCall),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+let oneArg = fn(a) { };
+oneArg(24);
+`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpReturn),
+				},
+				24,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpCall, 1),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+let manyArg = fn(a, b, c) { };
+manyArg(24, 25, 26);
+`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpReturn),
+				},
+				24,
+				25,
+				26,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpCall, 3),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+let oneArg = fn(a) { a };
+oneArg(24);
+`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpReturnValue),
+				},
+				24,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpCall, 1),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+let manyArg = fn(a, b, c) { a; b; c };
+manyArg(24, 25, 26);
+`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpGetLocal, 0),
+					code.Make(code.OpPop),
+					code.Make(code.OpGetLocal, 1),
+					code.Make(code.OpPop),
+					code.Make(code.OpGetLocal, 2),
+					code.Make(code.OpReturnValue),
+				},
+				24,
+				25,
+				26,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpCall, 3),
 				code.Make(code.OpPop),
 			},
 		},
@@ -767,4 +862,43 @@ func TestCompilerScopes(t *testing.T) {
 		t.Errorf("previousInstruction.Opcode wrong. got=%d, want=%d",
 			previous.Opcode, code.OpMul)
 	}
+}
+
+func TestBuiltins(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+len([]);
+push([], 1);
+`,
+			expectedConstants: []interface{}{1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpGetBuiltin, 0),
+				code.Make(code.OpArray, 0),
+				code.Make(code.OpCall, 1),
+				code.Make(code.OpPop),
+				code.Make(code.OpGetBuiltin, 5),
+				code.Make(code.OpArray, 0),
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpCall, 2),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `fn() { len([]) }`,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.OpGetBuiltin, 0),
+					code.Make(code.OpArray, 0),
+					code.Make(code.OpCall, 1),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+	runCompilerTests(t, tests)
 }

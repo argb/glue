@@ -23,6 +23,9 @@ func Start(in io.Reader, out io.Writer) {
 	var constants []object.Object
 	globals := make([]object.Object, vm.GlobalSize)
 	symbolTable := compiler.NewSymbolTable()
+	for i, v := range object.Builtins {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
 
 	color.Green(POEM)
 

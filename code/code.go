@@ -37,6 +37,7 @@ const (
 	OpReturn
 	OpGetLocal
 	OpSetLocal
+	OpGetBuiltin
 )
 
 type Definition struct {
@@ -66,11 +67,12 @@ var definitions = map[Opcode]*Definition{
 	OpArray: {"OpArray", [] int{2}}, // the operand is the length of the array, which is used to build the array literal
 	OpHash: {"OpHash", []int{2}}, // same with OpHash
 	OpIndex: {"OpIndex", []int{}},
-	OpCall: {"OpCall", []int{}},
+	OpCall: {"OpCall", []int{1}}, // 参数个数
 	OpReturnValue: {"OpReturnValue", []int{}},
 	OpReturn: {"OpReturn", []int{}},
 	OpGetLocal: {"OpGetLocal", []int{1}}, //操作数宽度1字节，也就是说本地变量不能超过256个，一个函数里面应该不会写那么多变量吧
 	OpSetLocal: {"OpSetLocal", []int{1}},
+	OpGetBuiltin: {"OpGetBuiltin", []int{1}}, //操作数是object.builtins包中Builtins数组的索引，这个直接拿来给VM用了
 }
 
 func Lookup(op byte) (*Definition, error) {

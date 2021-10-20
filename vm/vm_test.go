@@ -116,6 +116,16 @@ func testExpectedObject(
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
 		}
+	case *object.Error:
+		errObj, ok := actual.(*object.Error)
+		if !ok {
+			t.Errorf("object is not Error: %T (%+v)", actual, actual)
+			return
+		}
+		if errObj.Message != expected.Message {
+			t.Errorf("wrong error message. expected=%q, got=%q",
+				expected.Message, errObj.Message)
+		}
 	}
 }
 
@@ -428,6 +438,150 @@ globalSeed - num;
 minusOne() + minusTwo();
 `,
 			expected: 97,
+		},
+	}
+	runVmTests(t, tests)
+}
+
+func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
+	tests := []vmTestCase{
+	{
+		input: `
+let identity = fn(a) { a; };
+identity(4);
+`,
+		expected: 4,
+	},
+	{
+		input: `
+let sum = fn(a, b) { a + b; };
+sum(1, 2);
+`,
+		expected: 3,
+	},
+		{
+			input: `
+let sum = fn(a, b) {
+let c = a + b;
+c;
+};
+sum(1, 2);
+`,
+			expected: 3,
+		},
+		{
+			input: `
+let sum = fn(a, b) {
+let c = a + b;
+c;
+};
+sum(1, 2) + sum(3, 4);`,
+			expected: 10,
+		},
+		{
+			input: `
+let sum = fn(a, b) {
+let c = a + b;
+c;
+};
+let outer = fn() {
+sum(1, 2) + sum(3, 4);
+};
+outer();
+`,
+			expected: 10,
+		},
+		{
+			input: `
+let globalNum = 10;
+let sum = fn(a, b) {
+let c = a + b;
+c + globalNum;
+};
+let outer = fn() {
+sum(1, 2) + sum(3, 4) + globalNum;
+};
+outer() + globalNum;
+`,
+			expected: 50,
+		},
+}
+	runVmTests(t, tests)
+}
+
+func TestCallingFunctionsWithWrongArguments(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `fn() { 1; }(1);`,
+			expected: `wrong number of arguments: want=0, got=1`,
+		},
+		{
+			input: `fn(a) { a; }();`,
+			expected: `wrong number of arguments: want=1, got=0`,
+		},
+		{
+			input: `fn(a, b) { a + b; }(1);`,
+			expected: `wrong number of arguments: want=2, got=1`,
+		},
+	}
+	for _, tt := range tests {
+		program := parse(tt.input)
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			t.Fatalf("compiler error: %s", err)
+		}
+		vm := New(comp.Bytecode())
+		err = vm.Run()
+		if err == nil {
+			t.Fatalf("expected VM error but resulted in none.")
+		}
+		if err.Error() != tt.expected {
+			t.Fatalf("wrong VM error: want=%q, got=%q", tt.expected, err)
+		}
+	}
+}
+
+func TestBuiltinFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{`len("")`, 0},
+		{`len("four")`, 4},
+		{`len("hello world")`, 11},
+		{
+			`len(1)`,
+			&object.Error{
+				Message: "argument to `len` not supported, got INTEGER",
+			},
+		},
+		{`len("one", "two")`,
+			&object.Error{
+				Message: "wrong number of arguments. got=2, want=1",
+			},
+		},
+		{`len([1, 2, 3])`, 3},
+		{`len([])`, 0},
+		{`print("hello", "world!")`, Null},
+		{`first([1, 2, 3])`, 1},
+		{`first([])`, Null},
+		{`first(1)`,
+			&object.Error{
+				Message: "argument to `first` must be ARRAY, got INTEGER",
+			},
+		},
+		{`last([1, 2, 3])`, 3},
+		{`last([])`, Null},
+		{`last(1)`,
+			&object.Error{
+				Message: "argument to `last` must be ARRAY, got INTEGER",
+			},
+		},
+		{`rest([1, 2, 3])`, []int{2, 3}},
+		{`rest([])`, Null},
+		{`push([], 1)`, []int{1}},
+		{`push(1, 1)`,
+			&object.Error{
+				Message: "argument to `push` must be ARRAY, got INTEGER",
+			},
 		},
 	}
 	runVmTests(t, tests)
