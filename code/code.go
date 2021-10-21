@@ -38,6 +38,8 @@ const (
 	OpGetLocal
 	OpSetLocal
 	OpGetBuiltin
+	OpClosure
+	OpGetFree
 )
 
 type Definition struct {
@@ -73,6 +75,8 @@ var definitions = map[Opcode]*Definition{
 	OpGetLocal: {"OpGetLocal", []int{1}}, //操作数宽度1字节，也就是说本地变量不能超过256个，一个函数里面应该不会写那么多变量吧
 	OpSetLocal: {"OpSetLocal", []int{1}},
 	OpGetBuiltin: {"OpGetBuiltin", []int{1}}, //操作数是object.builtins包中Builtins数组的索引，这个直接拿来给VM用了
+	OpClosure: {"OpClosure", []int{2,1}},
+	OpGetFree: {"OpGetFree", []int{1}},
 }
 
 func Lookup(op byte) (*Definition, error) {
@@ -157,6 +161,18 @@ func (ins Instructions) String() string {
 	}
 	return out.String()
 }
+func FmtInstruction(ins Instructions, ip int) string {
+	var out bytes.Buffer
+
+	def, err := Lookup(ins[ip])
+	if err != nil {
+		fmt.Fprintf(&out, "ERROR: %s\n", err)
+		return ""
+	}
+	operands, _ := ReadOperands(def, ins[ip+1:])
+	fmt.Fprintf(&out, "%04d %s\n", ip, ins.fmtInstruction(def, operands))
+	return out.String()
+}
 func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 	operandCount := len(def.OperandWidths)
 	if len(operands) != operandCount {
@@ -168,6 +184,8 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 		return def.Name
 	case 1:
 		return fmt.Sprintf("%s %d", def.Name, operands[0])
+	case 2:
+		return fmt.Sprintf("%s %d %d", def.Name, operands[0], operands[1])
 	}
 	return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
 }

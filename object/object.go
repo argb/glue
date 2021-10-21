@@ -23,6 +23,7 @@ const (
 	ARRAY_OBJ = "ARRAY"
 	HASH_OBJ = "HASH"
 	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
+	CLOSURE_OBJ = "CLOSURE"
 )
 
 type Object interface {
@@ -240,4 +241,25 @@ func (cf *CompiledFunction) Type() ObjectType {
 
 func (cf *CompiledFunction) Inspect() string {
 	return fmt.Sprintf("CompiledFunction[%p]", cf)
+}
+
+// Closure /**
+/* a closure is actually created at runtime, but via the info from the compiling stage.
+也就是说闭包的构成在编译时已经确定了，只是在运行时利用编译时确定的信息来生成实际的闭包，vm在编译器的指导下
+创建闭包
+闭包是什么？可以说是一个持有自由变量的函数，而自由变量又是什么呢，就是可以在非函数作用域中使用，但是却不是
+在函数作用域下创建的变量。因为它不是在函数作用域下创建的，所以不会随着函数执行结束而被销毁，它自由的存在于
+函数作用域之外，函数通过某种方式enclose了这个自由变量，形成了closure
+ */
+type Closure struct {
+	Fn *CompiledFunction
+	Free []Object
+}
+
+func (c *Closure) Type() ObjectType {
+	return CLOSURE_OBJ
+}
+
+func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
 }

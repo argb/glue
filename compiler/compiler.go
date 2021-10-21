@@ -79,6 +79,8 @@ func (c *Compiler) loadSymbol(s Symbol) {
 		c.emit(code.OpGetLocal, s.Index)
 	case BuiltinScope:
 		c.emit(code.OpGetBuiltin, s.Index)
+	case FreeScope:
+		c.emit(code.OpGetFree, s.Index)
 	}
 }
 
@@ -92,12 +94,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 			}
 		}
 	case *ast.LetStatement:
+		// 生成符号，加入到当前作用域对应的符号表，当前作用域是在编译函数字面量的时候确定的，在此处处理 case *ast.FunctionLiteral:
+		symbol := c.symbolTable.Define(node.Name.Value)
 		err := c.Compile(node.Value)
 		if err != nil {
 			return err
 		}
-		// 生成符号，加入到当前作用域对应的符号表，当前作用域是在编译函数字面量的时候确定的，在此处处理 case *ast.FunctionLiteral:
-		symbol := c.symbolTable.Define(node.Name.Value)
+
 		//编译器只需要确定当前处理的符号是个本地变量还是全局变量，而不需要关心嵌套了几层
 		// 只要是局部变量就生成局部指令OpSetLocal, 而到底要从哪一层作用域取出绑定的数据有VM在运行时完成
 		// 其实VM也不需要去特殊判断，只要按正常的指令运算流程处理就可以了，因为整个栈机制和生成的每个指令执行方式就已经可以确保
@@ -288,14 +291,27 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if !c.lastInstructionIs(code.OpReturnValue) {
 			c.emit(code.OpReturn)
 		}
+		// 暂存自由变量，因为下面c.leaveScope()后，局部作用域就释放了，也就是对应的符号表就销毁了，因为指令已经生成完毕了
+		freeSymbols := c.symbolTable.FreeSymbols
 		numLocals := c.symbolTable.numDefinitions
+		//对函数字面量的解析完成了，退出当前函数的作用域
 		instructions := c.leaveScope()
+
+		// 生成对应的指令，用来把上面暂存的自由变量加载的栈上，VM会执行这些指令
+		for _, s := range freeSymbols {
+			c.loadSymbol(s)
+		}
+
 		compiledFn := &object.CompiledFunction{
 			Instructions: instructions,
 			NumLocals: numLocals,
 			NumParameters: len(node.Parameters),
 		}
-		c.emit(code.OpConstant, c.addConstant(compiledFn))
+
+		// 常量池里存储的依旧是object.CompiledFunction对象，VM执行到OpClosure指令才把它转化成object.Closure对象
+		fnIndex := c.addConstant(compiledFn)
+		//c.emit(code.OpConstant, c.addConstant(compiledFn))
+		c.emit(code.OpClosure, fnIndex, len(freeSymbols))
 	case *ast.ReturnStatement:
 		err := c.Compile(node.ReturnValue)
 		if err != nil {

@@ -30,7 +30,7 @@ type StackMonitor struct {
 }
 
 type Frame struct {
-	fn *object.CompiledFunction
+	cl *object.Closure
 	ip int
 	basePointer int
 }
@@ -39,9 +39,9 @@ type Frame struct {
 /*
 每个函数会对应一个栈帧，栈帧会存储函数的指令序列，调用前的执行栈sp值信息，函数调用结束后会用来恢复调用前的状态，继续执行主指令序列
  */
-func NewFrame(fn *object.CompiledFunction, basePointer int) *Frame {
+func NewFrame(cl *object.Closure, basePointer int) *Frame {
 	f := &Frame{
-		fn: fn,
+		cl: cl,
 		ip: -1, // VM run loop中 ip总是先自动+1，所以初始化成-1
 		basePointer: basePointer,
 	}
@@ -49,7 +49,7 @@ func NewFrame(fn *object.CompiledFunction, basePointer int) *Frame {
 }
 
 func (f *Frame) Instructions() code.Instructions {
-	return f.fn.Instructions
+	return f.cl.Fn.Instructions
 }
 
 type VM struct {
@@ -65,11 +65,22 @@ type VM struct {
 	frameIndex int // always pointing to the next available frame, equals len(frames)
 }
 
+// RuntimeInfo /**
+/*
+For debug
+ */
+type RuntimeInfo struct {
+	fp int
+	sp int
+	currIns []byte
+}
+
 func New(bytecode *compiler.Bytecode) *VM {
 	mainFn := &object.CompiledFunction{
 		Instructions: bytecode.Instructions,
 	}
-	mainFrame := NewFrame(mainFn, 0)
+	mainClosure := &object.Closure{Fn: mainFn}
+	mainFrame := NewFrame(mainClosure, 0)
 
 	frames := make([]*Frame, MaxFrames)
 	frames[0] = mainFrame //初始化一下VM的call stack，代码默认相当于写在一个主函数里
@@ -120,7 +131,7 @@ func (vm *VM) ShowReadableInstructions() {
 func (vm *VM) ShowReadableConstants() {
 	constants := vm.constants
 	color.Set(color.FgCyan)
-	fmt.Println("Data:")
+	fmt.Println("Constant Pool:")
 	color.Unset()
 	color.Set(color.FgGreen)
 	for i, c := range constants {
@@ -177,6 +188,9 @@ func (vm *VM) Run() error {
 		instructions = vm.currentFrame().Instructions()
 		//取出当前ip指向的指令，指令长度一字节，直接强制类型转换为Opcode类型，不会有信息丢失
 		op = code.Opcode(instructions[ip])
+
+		// for debug
+		//fmt.Print(code.FmtInstruction(instructions, ip))
 
 		switch op {
 		case code.OpConstant:
@@ -283,6 +297,15 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpGetFree:
+			freeIndex := code.ReadUint8(instructions[ip+1:])
+			vm.currentFrame().ip += 1
+
+			currentClosure := vm.currentFrame().cl
+			err := vm.push(currentClosure.Free[freeIndex])
+			if err != nil {
+				return err
+			}
 		case code.OpArray:
 			// OpArray 用来计算（构造）数组字面量，没错，数组的构造过程是在运行时进行的，因为数组每个元素可能是某个表达式的
 			// 计算结果，所以只能无法在编译期确定数组的具体元素内容
@@ -314,6 +337,15 @@ func (vm *VM) Run() error {
 			left := vm.pop()
 
 			err := vm.executeIndexExpression(left, index)
+			if err != nil {
+				return err
+			}
+		case code.OpClosure:
+			constIndex := code.ReadUint16(instructions[ip+1:])
+			numFree := code.ReadUint8(instructions[ip+3:])
+			vm.currentFrame().ip += 3
+
+			err := vm.pushClosure(int(constIndex), int(numFree))
 			if err != nil {
 				return err
 			}
@@ -371,26 +403,51 @@ func (vm *VM) Run() error {
 	return nil
 }
 
+// pushClosure /**
+/*
+构造Closure对象，然后压栈
+ */
+func (vm *VM) pushClosure(constIndex int, numFree int) error {
+	constant := vm.constants[constIndex]
+	function, ok := constant.(*object.CompiledFunction)
+	if !ok {
+		return fmt.Errorf("not a function: %+v", constant)
+	}
+
+	free := make([]object.Object, numFree)
+	for i:=0; i < numFree; i++ { //重要！顺序！要跟放到栈上的顺序保持一致，也就是跟自由变量在函数体中被引用的顺序保持一致
+		free[i] = vm.stack[vm.sp - numFree + i]
+	}
+	vm.sp = vm.sp - numFree
+
+	closure := &object.Closure{Fn: function, Free: free}
+
+	return vm.push(closure)
+}
+
 func (vm *VM) executeCall(numArgs int) error {
 	callee := vm.stack[vm.sp-1-numArgs]
 	switch callee := callee.(type) {
-	case *object.CompiledFunction:
-		return vm.callFunction(callee, numArgs)
+	case *object.Closure:
+		return vm.callClosure(callee, numArgs)
 	case *object.Builtin:
 		return vm.callBuiltin(callee, numArgs)
 	default:
 		return fmt.Errorf("calling non-function and non-builtin")
 	}
 }
-
-func (vm *VM) callFunction(fn *object.CompiledFunction, numArgs int) error {
-	if numArgs != fn.NumParameters {
-		return fmt.Errorf("wrong number of arguments: want=%d, got=%d", fn.NumParameters, numArgs)
+/**
+函数调用（所有函数都封装在一个Closure对象里），把closure对象挂到当前的栈帧上，指令可以通过stack frame-->closure-->free variables 这个引用链
+取到本次调用所需的free variables
+ */
+func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
+	if numArgs != cl.Fn.NumParameters {
+		return fmt.Errorf("wrong number of arguments: want=%d, got=%d", cl.Fn.NumParameters, numArgs)
 	}
-	frame := NewFrame(fn, vm.sp - numArgs)
+	frame := NewFrame(cl, vm.sp - numArgs)
 	vm.pushFrame(frame)
 
-	vm.sp = frame.basePointer + fn.NumLocals
+	vm.sp = frame.basePointer + cl.Fn.NumLocals
 
 	return nil
 }

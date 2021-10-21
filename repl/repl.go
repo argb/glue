@@ -38,6 +38,14 @@ func Start(in io.Reader, out io.Writer) {
 			return
 		}
 		line := scanner.Text()
+/*
+		line = `let newAdder = fn(a) {
+let adder = fn(b) { a + b; };
+return adder;
+};
+let addTwo = newAdder(2);
+addTwo(3);`
+*/
 		l := lexer.New(line)
 		p := parser.New(l)
 
