@@ -193,7 +193,7 @@ func (vm *VM) Run() error {
 		op = code.Opcode(instructions[ip])
 
 		// for debug
-		fmt.Print(code.FmtInstruction(instructions, ip))
+		//fmt.Print(code.FmtInstruction(instructions, ip))
 
 		//mn.AddInstruction(code.FmtInstruction(instructions, ip)) // for debug
 

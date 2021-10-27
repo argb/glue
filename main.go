@@ -57,13 +57,13 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	//iptFile = "./examples/t1.gl"
+	iptFile = "./examples/t5.gl"
 	fmt.Println(iptFile)
 
 	//fmt.Printf("input and args0: %#v, %#v\n", *input, args[0])
 
-	//l := lexer.NewFromFile(iptFile)
-	l :=lexer.New("-a * b")
+	l := lexer.NewFromFile(iptFile)
+	//l :=lexer.New("-a * b")
 	p := parser.New(l)
 	program := p.ParseProgram()
 	if *engine == "vm" {
@@ -72,6 +72,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		//fmt.Println("instructions:", c.Bytecode().Instructions.String())
 		machine := vm.New(c.Bytecode())
 		err = machine.Run()
 		if err != nil {

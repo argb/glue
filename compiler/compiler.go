@@ -403,6 +403,10 @@ func (c *Compiler) addInstruction(ins []byte) int {
 	return posNewInstruction
 }
 
+// Bytecode /*
+/*
+第一层指令，全局指令
+ */
 func (c *Compiler) Bytecode() *Bytecode {
 	return &Bytecode{
 		Instructions: c.currentInstructions(),
