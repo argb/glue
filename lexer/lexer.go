@@ -64,6 +64,9 @@ func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input){
 		err := l.readLine()
 		if err != nil {
+			// 这种情况依然向后移动光标位置主要是因为现在readIdentifier()这个函数处理标志符时候依赖这个位置，不继续向前的话position跟l.position
+			// 会变成相等，input[position:l.position]就会取到空字符串，而不是最后的字符，最后一个字符会丢掉了。
+			// 暂且这样
 			l.ch =0
 		}else {
 			// 因为加载了新内容，所以重置读取光标位置

@@ -57,7 +57,7 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	iptFile = "./examples/t1.gl"
+	//iptFile = "./examples/t1.gl"
 	fmt.Println(iptFile)
 
 	//fmt.Printf("input and args0: %#v, %#v\n", *input, args[0])
