@@ -1,9 +1,9 @@
 package vm
 
 import (
-	"compiler01/code"
-	"compiler01/compiler"
-	"compiler01/object"
+	"glue/code"
+	"glue/compiler"
+	"glue/object"
 	"fmt"
 	"github.com/fatih/color"
 )

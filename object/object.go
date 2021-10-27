@@ -2,8 +2,8 @@ package object
 
 import (
 	"bytes"
-	"compiler01/ast"
-	"compiler01/code"
+	"glue/ast"
+	"glue/code"
 	"fmt"
 	"hash/fnv"
 	"strings"

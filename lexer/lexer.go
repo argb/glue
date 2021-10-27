@@ -3,8 +3,8 @@ package lexer
 import (
 	"bufio"
 	"bytes"
-	"compiler01/token"
 	"fmt"
+	"glue/token"
 	"io"
 	"os"
 	"path/filepath"

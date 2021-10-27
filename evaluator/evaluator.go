@@ -1,8 +1,8 @@
 package evaluator
 
 import (
-	"compiler01/ast"
-	"compiler01/object"
+	"glue/ast"
+	"glue/object"
 	"fmt"
 	"reflect"
 )

@@ -1,11 +1,11 @@
 package compiler
 
 import (
-	"compiler01/ast"
-	"compiler01/code"
-	"compiler01/lexer"
-	"compiler01/object"
-	"compiler01/parser"
+	"glue/ast"
+	"glue/code"
+	"glue/lexer"
+	"glue/object"
+	"glue/parser"
 	"fmt"
 	"testing"
 )

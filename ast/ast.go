@@ -2,7 +2,7 @@ package ast
 
 import (
 	"bytes"
-	"compiler01/token"
+	"glue/token"
 	"strings"
 )
 

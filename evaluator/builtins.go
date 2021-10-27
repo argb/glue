@@ -1,7 +1,7 @@
 package evaluator
 
 import (
-	"compiler01/object"
+	"glue/object"
 )
 
 var builtins = map[string]*object.Builtin{

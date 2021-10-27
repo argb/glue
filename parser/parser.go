@@ -1,9 +1,9 @@
 package parser
 
 import (
-	"compiler01/ast"
-	"compiler01/lexer"
-	"compiler01/token"
+	"glue/ast"
+	"glue/lexer"
+	"glue/token"
 	"fmt"
 	"reflect"
 	"strconv"

@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"compiler01/lexer"
-	"compiler01/parser"
+	"glue/lexer"
+	"glue/parser"
 	"fmt"
 	"os"
 	"strconv"

@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"compiler01/token"
+	"glue/token"
 	"testing"
 )
 

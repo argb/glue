@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"compiler01/lexer"
-	"compiler01/object"
-	"compiler01/parser"
+	"glue/lexer"
+	"glue/object"
+	"glue/parser"
 	"testing"
 )
 

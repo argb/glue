@@ -1,4 +1,4 @@
-module compiler01
+module glue
 
 go 1.17
 

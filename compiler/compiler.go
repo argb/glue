@@ -1,9 +1,9 @@
 package compiler
 
 import (
-	"compiler01/ast"
-	"compiler01/code"
-	"compiler01/object"
+	"glue/ast"
+	"glue/code"
+	"glue/object"
 	"fmt"
 	"sort"
 )

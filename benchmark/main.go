@@ -1,12 +1,12 @@
 package main
 
 import (
-	"compiler01/compiler"
-	"compiler01/evaluator"
-	"compiler01/lexer"
-	"compiler01/object"
-	"compiler01/parser"
-	"compiler01/vm"
+	"glue/compiler"
+	"glue/evaluator"
+	"glue/lexer"
+	"glue/object"
+	"glue/parser"
+	"glue/vm"
 	"flag"
 	"fmt"
 	"time"

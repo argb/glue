@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"compiler01/ast"
-	"compiler01/lexer"
+	"glue/ast"
+	"glue/lexer"
 	"fmt"
 	"testing"
 )

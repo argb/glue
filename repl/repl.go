@@ -2,11 +2,11 @@ package repl
 
 import (
 	"bufio"
-	"compiler01/compiler"
-	"compiler01/lexer"
-	"compiler01/object"
-	"compiler01/parser"
-	"compiler01/vm"
+	"glue/compiler"
+	"glue/lexer"
+	"glue/object"
+	"glue/parser"
+	"glue/vm"
 	"fmt"
 	"github.com/fatih/color"
 	"io"
