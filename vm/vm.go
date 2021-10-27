@@ -177,6 +177,9 @@ func (vm *VM) Run() error {
 	var ip int
 	var instructions code.Instructions
 	var op code.Opcode
+
+	//mn := monitor.SingletonNew()
+
 	//VM进入运行状态，ip是指令指针，每次向前移动一个字节，
 	//每条指令的宽度可能不同，所以每条指令执行完后必须jump over合适的operands，如果碰到无法识别的指令，就会造成指令的执行出错，因为
 	//可能会导致IP指向操作数，会导致后续所有指令的执行不可预测，出一些奇怪的错误
@@ -190,7 +193,9 @@ func (vm *VM) Run() error {
 		op = code.Opcode(instructions[ip])
 
 		// for debug
-		//fmt.Print(code.FmtInstruction(instructions, ip))
+		fmt.Print(code.FmtInstruction(instructions, ip))
+
+		//mn.AddInstruction(code.FmtInstruction(instructions, ip)) // for debug
 
 		switch op {
 		case code.OpConstant:
@@ -382,7 +387,9 @@ func (vm *VM) Run() error {
 			frame := vm.popFrame()
 			// 小优化， -1 代替之前的vm.pop, 一步到位，相当于直接把函数对象也从栈上移除了，函数对象哪来的？编译的时候绑定到函数名上的，所以
 			// 函数调用的上一条指令一定是OpGetGlobal或者OpGetLocal, 这是有编译器决定的
-			vm.sp = frame.basePointer - 1 // 恢复函数调用前的sp位置
+			//vm.sp = frame.basePointer - 1 // 恢复函数调用前的sp位置
+			vm.sp = frame.basePointer
+			vm.pop() // 把函数对象出栈
 
 			err := vm.push(returnValue)
 			if err != nil {
@@ -391,7 +398,9 @@ func (vm *VM) Run() error {
 		case code.OpReturn:
 			frame := vm.popFrame()
 			//vm.pop()
-			vm.sp = frame.basePointer - 1
+			//vm.sp = frame.basePointer - 1
+			vm.sp = frame.basePointer
+			vm.pop()
 
 			err := vm.push(Null)
 			if err != nil {
@@ -427,12 +436,20 @@ func (vm *VM) pushClosure(constIndex int, numFree int) error {
 
 func (vm *VM) executeCall(numArgs int) error {
 	callee := vm.stack[vm.sp-1-numArgs]
+	fmt.Println(callee.Inspect())
+	/*
+	for _, item := range vm.stack[0:3] {
+		println(item.Inspect())
+	}
+	 */
+	//fmt.Println(vm.stack[0:10])
 	switch callee := callee.(type) {
 	case *object.Closure:
 		return vm.callClosure(callee, numArgs)
 	case *object.Builtin:
 		return vm.callBuiltin(callee, numArgs)
 	default:
+		fmt.Printf("debug, callee: %#v\n", callee)
 		return fmt.Errorf("calling non-function and non-builtin")
 	}
 }
@@ -447,7 +464,7 @@ func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
 	frame := NewFrame(cl, vm.sp - numArgs)
 	vm.pushFrame(frame)
 
-	vm.sp = frame.basePointer + cl.Fn.NumLocals
+	vm.sp = frame.basePointer + cl.Fn.NumLocals // NumLocals =（包括局部变量+形参）两者的数量，所以这里不必在加上numArgs
 
 	return nil
 }
@@ -678,6 +695,7 @@ func (vm *VM) push(o object.Object) error {
 func (vm *VM) pop() object.Object {
 	// 规定 sp 始终指向下一个可用槽位，所以当前槽位就是sp-1
 	o := vm.stack[vm.sp-1]
+	//vm.stack[vm.sp-1] = nil // 不是必须的，但是把出栈后清空数据方便调试
 	vm.sp--
 
 	return o

@@ -2,37 +2,29 @@ package main
 
 import (
 	"bufio"
+	"compiler01/compiler"
 	"compiler01/evaluator"
 	"compiler01/lexer"
 	"compiler01/object"
 	"compiler01/parser"
 	"compiler01/repl"
+	"compiler01/vm"
 	"encoding/binary"
 	"flag"
 	"fmt"
 	"github.com/fatih/color"
 	"io"
 	"os"
-	user2 "os/user"
+	"os/user"
 	"reflect"
 	"strings"
 )
 
 func main() {
-	//fmt.Println((*int)(nil) == (*int)(nil))
-	user, err := user2.Current()
+	user, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
-	//t10()
-	//t1()
-	//ttt()
-//tt()
-	/*
-	f := flag.String("src", "", "source file")
-	flag.Parse()
-	f, err := os.OpenFile(*f, os.O_RDONLY, 0644)
-	 */
 
 	//terminal.Set(terminal.FG_GREEN)
 	color.Set(color.FgMagenta)
@@ -41,8 +33,72 @@ func main() {
 	fmt.Printf("欢迎使用【Go艹】语言！\n")
 	color.Unset()
 
-	//terminal.TT()
-	repl.Start(os.Stdin, os.Stdout)
+	interactive := flag.Bool("i", false, "start REPL")
+	engine := flag.String("engine", "vm", "the running mode, evaluate directly or by vm")
+	input := flag.String("src", "", "the input(source) file name")
+	//output := flag.String("src", "", "the output file name")
+	flag.Parse()
+	if *interactive == true {
+		//terminal.TT()
+		repl.Start(os.Stdin, os.Stdout)
+		return
+	}
+	args :=flag.Args()
+	var iptFile string
+
+	if *input == "" {
+		if len(args) == 0 {
+			fmt.Println("请指定原文件")
+			//return
+		}else {
+			iptFile = args[0]
+		}
+
+	}else {
+		iptFile = *input
+	}
+	iptFile = "./examples/t1.gl"
+	fmt.Println(iptFile)
+
+	//fmt.Printf("input and args0: %#v, %#v\n", *input, args[0])
+
+	//l := lexer.NewFromFile(iptFile)
+	l :=lexer.New("-a * b")
+	p := parser.New(l)
+	program := p.ParseProgram()
+	if *engine == "vm" {
+		c := compiler.New()
+		err = c.Compile(program)
+		if err != nil {
+			panic(err)
+		}
+		machine := vm.New(c.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			panic(err)
+		}
+		result := machine.LastPoppedStackElem()
+		//io.WriteString(os.Stdout, lastPopped.Inspect())
+		//io.WriteString(os.Stdout, "\n")
+		fmt.Println("engine: vm")
+		fmt.Println(result.Inspect())
+		machine.ShowReadableConstants()
+		//mn := monitor.SingletonNew()
+		//fmt.Println("Instruction sequence:")
+		//mn.ShowInstructions()
+
+	}else {
+		env := object.NewEnvironment()
+		result := evaluator.Eval(program, env)
+		fmt.Println("engine: evaluating")
+		fmt.Println(result)
+	}
+
+
+	if err != nil {
+		panic(err)
+	}
+
 /*
 	input :=`
 let map = fn(arr, f) {
@@ -73,22 +129,13 @@ map(a, double);
 }
 
 func testEval(input string) object.Object {
-	l := lexer.New(input)
+	l := lexer.NewForREPL(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
 
 	env := object.NewEnvironment()
 
 	return evaluator.Eval(program, env)
-}
-
-func doRead() string{
-	flag.Parse()
-	if len(flag.Args()) == 0 {
-		fmt.Printf("usage: byLine <file1> [<file2> ...]\n")
-		return ""
-	}
-	return lineByLine(flag.Args()[0])
 }
 
 func lineByLine(file string) string {

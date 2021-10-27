@@ -1,0 +1,14 @@
+let a=10;
+let b=11;
+let c=12;
+let x=fn(x1,x2){
+    let m=100;
+    let n=200;
+    return m+n;
+}
+let i=1;
+let j=2;
+x(i,j);
+let k=888
+k;
+

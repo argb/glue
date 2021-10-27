@@ -9,6 +9,7 @@ var Builtins = []struct{
 	{
 		"len",
 		&Builtin{
+			Name: "len",
 			Fn: func(args ...Object) Object {
 				if len(args) != 1 {
 					return newError("wrong number of arguments. got=%d, want=1", len(args))
@@ -27,6 +28,7 @@ var Builtins = []struct{
 	{
 		"print",
 		&Builtin{
+			Name: "print",
 			Fn: func(args ...Object) Object {
 				for _, arg := range args {
 					//fmt.Printf("arg:%#v\n", arg)
@@ -39,6 +41,7 @@ var Builtins = []struct{
 	{
 		"first",
 		&Builtin{
+			Name: "first",
 			Fn: func(args ...Object) Object {
 				if len(args) != 1 {
 					return newError("wrong number of arguments. got=%d, want=1", len(args))
@@ -57,6 +60,7 @@ var Builtins = []struct{
 	{
 		"last",
 		&Builtin{
+			Name: "last",
 			Fn: func(args ...Object) Object {
 				if len(args) != 1 {
 					return newError("wrong number of arguments. got=%d, want=1",
@@ -78,6 +82,7 @@ var Builtins = []struct{
 	{
 		"rest",
 		&Builtin{
+			Name: "rest",
 			Fn: func(args ...Object) Object {
 				if len(args) != 1 {
 					return newError("wrong number of arguments. got=%d, want=1",
@@ -101,6 +106,7 @@ var Builtins = []struct{
 	{
 		"push",
 		&Builtin{
+			Name: "push",
 			Fn: func(args ...Object) Object {
 				if len(args) != 2 {
 					return newError("wrong number of arguments. got=%d, want=1",

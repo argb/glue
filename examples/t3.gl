@@ -1,0 +1,10 @@
+let a=[1,2,3,4]
+let f=fn(x,y,z){
+    print(x);
+    print(y);
+    print(z);
+}
+
+f(rest(a),first(a),first(a));
+
+print(a)

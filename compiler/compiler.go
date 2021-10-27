@@ -293,7 +293,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 		// 暂存自由变量，因为下面c.leaveScope()后，局部作用域就释放了，也就是对应的符号表就销毁了，因为指令已经生成完毕了
 		freeSymbols := c.symbolTable.FreeSymbols
-		numLocals := c.symbolTable.numDefinitions
+		numLocals := c.symbolTable.numDefinitions // 形式参数也看做局部变量
 		//对函数字面量的解析完成了，退出当前函数的作用域
 		instructions := c.leaveScope()
 
@@ -303,12 +303,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 		compiledFn := &object.CompiledFunction{
+			Name: node.String(),
 			Instructions: instructions,
 			NumLocals: numLocals,
 			NumParameters: len(node.Parameters),
 		}
 
-		// 常量池里存储的依旧是object.CompiledFunction对象，VM执行到OpClosure指令才把它转化成object.Closure对象
+		// 字面量，包括函数定义，统统看做常量，常量池里存储的依旧是object.CompiledFunction对象，VM执行到OpClosure指令才把它转化成object.Closure对象
 		fnIndex := c.addConstant(compiledFn)
 		//c.emit(code.OpConstant, c.addConstant(compiledFn))
 		c.emit(code.OpClosure, fnIndex, len(freeSymbols))

@@ -137,6 +137,7 @@ type BuiltinFunction func(args ...Object) Object
 
 type Builtin struct {
 	Fn BuiltinFunction
+	Name string
 }
 
 func (b *Builtin) Type() ObjectType {
@@ -144,7 +145,7 @@ func (b *Builtin) Type() ObjectType {
 }
 
 func (b *Builtin) Inspect() string {
-	return "builtin function"
+	return "builtin function: "+b.Name
 }
 
 type Array struct {
@@ -230,6 +231,7 @@ func (h *Hash) Inspect() string {
 }
 
 type CompiledFunction struct {
+	Name string
 	Instructions code.Instructions
 	NumLocals int
 	NumParameters int
@@ -240,7 +242,7 @@ func (cf *CompiledFunction) Type() ObjectType {
 }
 
 func (cf *CompiledFunction) Inspect() string {
-	return fmt.Sprintf("CompiledFunction[%p]", cf)
+	return fmt.Sprintf("CompiledFunction[%p], %s", cf, cf.Name)
 }
 
 // Closure /**
@@ -261,5 +263,5 @@ func (c *Closure) Type() ObjectType {
 }
 
 func (c *Closure) Inspect() string {
-	return fmt.Sprintf("Closure[%p]", c)
+	return fmt.Sprintf("Closure[%p], %s", c, c.Fn.Inspect())
 }

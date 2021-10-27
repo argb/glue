@@ -355,6 +355,17 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+func (p *Parser) parseE() ast.Expression {
+	var leftEpsilon ast.Expression //
+	initOp := "epsilon"
+	precedence := LOWEST
+	exp := &ast.InfixExpression{Left: leftEpsilon, Operator: initOp}
+	right := p.parseExpression(precedence)
+	exp.Right = right
+
+	return exp
+}
+
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	//fmt.Printf("token: %#v \n", p.curToken)
 	prefix := p.prefixParserFns[p.curToken.Type]
@@ -374,6 +385,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		p.nextToken()
 
 		leftExp = infix(leftExp)
+
 	}
 
 	return leftExp
