@@ -76,7 +76,7 @@
       <recent name="$PROJECT_DIR$/tools/log" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build glue/trivial">
+  <component name="RunManager" selected="Go Build.go build glue">
     <configuration name="go build glue" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$" />
@@ -97,8 +97,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build glue/trivial" />
         <item itemvalue="Go Build.go build glue" />
+        <item itemvalue="Go Build.go build glue/trivial" />
       </list>
     </recent_temporary>
   </component>
