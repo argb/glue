@@ -1,0 +1,15 @@
+file: ./examples/t5.gl
+0000 OpClosure 2 0
+0004 OpSetGlobal 0
+0007 OpGetGlobal 0
+0010 OpCall 0
+Closure[0xc0000c2180], CompiledFunction[0xc0000c8200], fn()let f2 = fn(x);return f2(100);
+0000 OpClosure 0 0
+0004 OpSetLocal 0
+0006 OpGetLocal 0
+0008 OpConstant 1
+0011 OpCall 1
+Closure[0xc0000c21a0], CompiledFunction[0xc0000c81c0], fn(x)
+0000 OpReturn
+0013 OpReturnValue
+0012 OpPop

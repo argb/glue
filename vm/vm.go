@@ -1,11 +1,11 @@
 package vm
 
 import (
+	"fmt"
+	"github.com/fatih/color"
 	"glue/code"
 	"glue/compiler"
 	"glue/object"
-	"fmt"
-	"github.com/fatih/color"
 )
 
 
@@ -193,7 +193,7 @@ func (vm *VM) Run() error {
 		op = code.Opcode(instructions[ip])
 
 		// for debug
-		//fmt.Print(code.FmtInstruction(instructions, ip))
+		fmt.Print(code.FmtInstruction(instructions, ip))
 
 		//mn.AddInstruction(code.FmtInstruction(instructions, ip)) // for debug
 
@@ -594,7 +594,7 @@ func (vm *VM) executeBangOperator() error {
 func (vm *VM) executeComparison(op code.Opcode) error {
 	right := vm.pop()
 	left := vm.pop()
-	if left.Type() == object.INTEGER_OBJ || right.Type() == object.INTEGER_OBJ {
+	if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 		return vm.executeIntegerComparison(op, left, right)
 	}
 
@@ -684,6 +684,9 @@ func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.O
 func (vm *VM) push(o object.Object) error {
 	if vm.sp >= StackSize {
 		return fmt.Errorf("stack overflow")
+	}
+	if o == nil {
+		return fmt.Errorf("got nil operand, sp: %d", vm.sp)
 	}
 
 	vm.stack[vm.sp] = o

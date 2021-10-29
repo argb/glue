@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"glue/token"
+	"glue/tools/log"
 	"io"
 	"os"
 	"path/filepath"
@@ -19,7 +20,7 @@ type Lexer struct {
 	char string // for debug, the string format of ch
 
 	currLineNum int
-	currColNm int
+	currColNum int
 
 	lines []string
 }
@@ -47,10 +48,11 @@ func NewFromFile(filename string) *Lexer {
 	err := l.loadSrc(filename)
 	//fmt.Println(l.lines)
 	if err != nil {
+		log.ErrorF("load src file %s failed, error:%s", filename, err)
 		panic(err)
 	}
 	l.currLineNum = 0
-	l.currColNm = 0
+	l.currColNum = 0
 
 	l.readChar() // init read cursor
 
@@ -61,6 +63,7 @@ func NewFromFile(filename string) *Lexer {
 该函数的正确性非常重要，是后面一切处理的基石。
  */
 func (l *Lexer) readChar() {
+	lineLen := len(l.input)
 	if l.readPosition >= len(l.input){
 		err := l.readLine()
 		if err != nil {
@@ -80,11 +83,17 @@ func (l *Lexer) readChar() {
 	}else {
 		l.ch = l.input[l.readPosition]
 		l.char = string(l.ch) // for debug
-
 	}
 
 	l.position = l.readPosition
 	l.readPosition +=1
+
+	if l.position >= lineLen {
+		l.currColNum = lineLen
+
+	}else {
+		l.currColNum = l.position
+	}
 
 }
 
@@ -132,28 +141,28 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case ';':
-		tok = newToken(token.SEMICOLON, l.ch)
+		tok = l.newToken(token.SEMICOLON, l.ch)
 	case '(':
-		tok = newToken(token.LPAREN, l.ch)
+		tok = l.newToken(token.LPAREN, l.ch)
 	case ')':
-		tok = newToken(token.RPAREN, l.ch)
+		tok = l.newToken(token.RPAREN, l.ch)
 	case ',':
-		tok = newToken(token.COMMA, l.ch)
+		tok = l.newToken(token.COMMA, l.ch)
 	case '+':
-		tok = newToken(token.PLUS, l.ch)
+		tok = l.newToken(token.PLUS, l.ch)
 	case '-':
-		tok = newToken(token.MINUS, l.ch)
+		tok = l.newToken(token.MINUS, l.ch)
 	case '/':
-		tok = newToken(token.SLASH, l.ch)
+		tok = l.newToken(token.SLASH, l.ch)
 	case '*':
-		tok = newToken(token.ASTERISK, l.ch)
+		tok = l.newToken(token.ASTERISK, l.ch)
 	case '=':
 		if l.peakChar() == '=' {
 			ch := l.ch
 			l.readChar()
 			tok = token.Token{Type: token.EQ, Literal: string(ch)+string(l.ch)}
 		}else {
-			tok = newToken(token.ASSIGN, l.ch)
+			tok = l.newToken(token.ASSIGN, l.ch)
 		}
 	case '!':
 		if l.peakChar() == '=' {
@@ -161,27 +170,27 @@ func (l *Lexer) NextToken() token.Token {
 			l.readChar()
 			tok = token.Token{Type: token.NOT_EQ, Literal: string(ch)+string(l.ch)}
 		}else {
-			tok = newToken(token.BANG, l.ch)
+			tok = l.newToken(token.BANG, l.ch)
 		}
 	case '<':
-		tok = newToken(token.LT, l.ch)
+		tok = l.newToken(token.LT, l.ch)
 	case '>':
-		tok = newToken(token.GT, l.ch)
+		tok = l.newToken(token.GT, l.ch)
 	case '{':
-		tok = newToken(token.LBRACE, l.ch)
+		tok = l.newToken(token.LBRACE, l.ch)
 	case '}':
-		tok = newToken(token.RBRACE, l.ch)
+		tok = l.newToken(token.RBRACE, l.ch)
 	case '"':
 		//fmt.Println("xxxxx")
 		tok.StartChar = '"'
 		tok.Type = token.STRING
 		tok.Literal = l.readString2(&tok)
 	case '[':
-		tok = newToken(token.LBRACKET, l.ch)
+		tok = l.newToken(token.LBRACKET, l.ch)
 	case ']':
-		tok = newToken(token.RBRACKET, l.ch)
+		tok = l.newToken(token.RBRACKET, l.ch)
 	case ':':
-		tok = newToken(token.COLON, l.ch)
+		tok = l.newToken(token.COLON, l.ch)
 
 	case 0:
 		tok.Literal = ""
@@ -197,7 +206,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.INT
 			return tok
 		}else {
-			tok = newToken(token.ILLEGAL, l.ch)
+			tok = l.newToken(token.ILLEGAL, l.ch)
 		}
 	}
 
@@ -266,10 +275,13 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
-func newToken(tokenType token.TokenType, char byte) token.Token {
+func (l *Lexer) newToken(tokenType token.TokenType, char byte) token.Token {
 	return token.Token{
 		Type: tokenType,
 		Literal: string(char),
+
+		LineNum: l.currLineNum,
+		ColumnNum: l.currColNum,
 	}
 }
 

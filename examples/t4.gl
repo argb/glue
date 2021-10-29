@@ -1,14 +1,10 @@
-let map = fn(arr, f) {
+let map = fn(arr) {
     let iter = fn(arr, accumulated) {
-        return iter(rest(arr), push(accumulated, f(first(arr))));
+        return iter(1, 1);
     };
-    return iter(arr, []);
+    return iter(1, 1);
 };
 
-let a = [1,2,3,4,5];
 
-let double = fn(x) {
-    return x * 2;
-};
 
-map(a, double);
+map(1);

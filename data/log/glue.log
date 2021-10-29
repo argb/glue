@@ -1,0 +1,7 @@
+[INFO]2021/10/29 23:35:19 log_helper.go:50: input file 
+[INFO]2021/10/29 23:36:42 log_helper.go:50: input file%!(EXTRA string=)
+[INFO]2021/10/30 02:49:18 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 02:55:26 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 02:56:06 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 03:00:01 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 03:00:18 log_helper.go:48: source file: ./examples/t8.gl

@@ -1,0 +1,19 @@
+let a=10;
+let f1=fn(){
+    let b=20;
+    let c=30;
+    let d=40;
+    let f2=fn(){
+        let f3=fn(){
+            let f4=fn(){
+                let f5= fn(){
+                    let n= a+b+c+d;
+                    return n;
+                }
+            }
+        }
+    }
+    f2()
+}
+
+f1();

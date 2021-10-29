@@ -12,6 +12,7 @@ import (
 	"glue/object"
 	"glue/parser"
 	"glue/repl"
+	"glue/tools/log"
 	"glue/vm"
 	"io"
 	"os"
@@ -21,14 +22,14 @@ import (
 )
 
 func main() {
-	user, err := user.Current()
+	currUser, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
 
 	//terminal.Set(terminal.FG_GREEN)
 	color.Set(color.FgMagenta)
-	fmt.Printf("你好 %s! 吃了吗？\n", user.Username)
+	fmt.Printf("你好 %s! 吃了吗？\n", currUser.Username)
 	//terminal.Unset()
 	fmt.Printf("欢迎使用【Go艹】语言！\n")
 	color.Unset()
@@ -38,6 +39,7 @@ func main() {
 	input := flag.String("src", "", "the input(source) file name")
 	//output := flag.String("src", "", "the output file name")
 	flag.Parse()
+	fmt.Println(*interactive)
 	if *interactive == true {
 		//terminal.TT()
 		repl.Start(os.Stdin, os.Stdout)
@@ -48,8 +50,9 @@ func main() {
 
 	if *input == "" {
 		if len(args) == 0 {
-			fmt.Println("请指定原文件")
-			//return
+			fmt.Println("请指定源文件，示例：")
+			fmt.Println("./glue helloworld.gl")
+			return
 		}else {
 			iptFile = args[0]
 		}
@@ -57,8 +60,9 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	iptFile = "./examples/t5.gl"
+	//iptFile = "./examples/t5.gl"
 	fmt.Println(iptFile)
+	log.Infof("source file: %s", iptFile)
 
 	//fmt.Printf("input and args0: %#v, %#v\n", *input, args[0])
 
@@ -66,16 +70,22 @@ func main() {
 	//l :=lexer.New("-a * b")
 	p := parser.New(l)
 	program := p.ParseProgram()
+	if p.HasError() {
+		p.ReportParseErrors()
+		os.Exit(10)
+	}
 	if *engine == "vm" {
 		c := compiler.New()
 		err = c.Compile(program)
 		if err != nil {
+			log.ErrorF("error %s", err)
 			panic(err)
 		}
 		//fmt.Println("instructions:", c.Bytecode().Instructions.String())
 		machine := vm.New(c.Bytecode())
 		err = machine.Run()
 		if err != nil {
+			log.ErrorF("error %s", err)
 			panic(err)
 		}
 		result := machine.LastPoppedStackElem()

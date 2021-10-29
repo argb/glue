@@ -6,8 +6,8 @@ type Token struct {
 	StartChar byte // 被视为非法token字面量的一部分，不会被视为合法token的一部分，主要是为了便于追踪错误
 	Type TokenType
 	Literal string
-	lineNum int
-	columnNum int
+	LineNum int
+	ColumnNum int
 }
 
 // token types

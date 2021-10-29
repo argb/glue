@@ -1,12 +1,13 @@
 package parser
 
 import (
+	"fmt"
 	"glue/ast"
 	"glue/lexer"
 	"glue/token"
-	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 // 操作符优先级
@@ -39,9 +40,32 @@ var precedences = map[token.TokenType]int{
 }
 
 type ParseError struct {
-	Token token.Token
+	Token *token.Token
 	LineNum int
+	ColNum int
 	msg string
+}
+
+func (pe *ParseError) String() string {
+	var builder strings.Builder
+	var lineNum, colNum int
+	if pe.Token != nil {
+		lineNum = pe.Token.LineNum
+		colNum = pe.Token.ColumnNum
+	}else{
+		lineNum = pe.LineNum
+		colNum = pe.ColNum
+	}
+	builder.Grow(100)
+	builder.WriteString(pe.msg)
+	builder.WriteString("[")
+	builder.WriteString(string(strconv.Itoa(lineNum)))
+	builder.WriteString(":")
+	builder.WriteString(strconv.Itoa(colNum))
+	builder.WriteString("]")
+	builder.Cap()
+
+	return builder.String()
 }
 
 func (pe *ParseError) Error() string {
@@ -239,9 +263,27 @@ func (p *Parser) Errors() []string {
 	return p.errors
 }
 
+func (p *Parser) HasError() bool {
+	if len(p.errors) > 0 {
+		return true
+	}
+
+	return false
+}
+
+func (p *Parser) ReportParseErrors() {
+	for _, err := range p.errors {
+		fmt.Println(err)
+	}
+}
+
 func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
-	p.errors = append(p.errors, msg)
+	pErr := new(ParseError)
+	pErr.Token = &p.curToken
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead.", t, p.peekToken.Type)
+	pErr.msg = msg
+
+	p.errors = append(p.errors, pErr.String())
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
@@ -272,7 +314,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		return true
 	}else {
 		// 这个报错信息主要是开始测试用例使用过，现在不应该有了，因为不算是个错误，只是个判断封装
-		//p.peekError(t)
+		p.peekError(t)
 		return false
 	}
 }
@@ -350,9 +392,13 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
-	fmt.Printf("token:%#v, token-literal:%s\n", t, p.curToken.Literal)
-	fmt.Println(msg)
-	p.errors = append(p.errors, msg)
+	//fmt.Printf("token:%#v, token-literal:%s\n", t, p.curToken.Literal)
+	//fmt.Println(msg)
+	pErr := new(ParseError)
+	pErr.Token = &p.curToken
+	pErr.msg = msg
+
+	p.errors = append(p.errors, pErr.String())
 }
 
 func (p *Parser) parseE() ast.Expression {
@@ -462,6 +508,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 			return stmt
 		}
 		//fmt.Println("从这里返回了")
+
 		return nil
 	}
 

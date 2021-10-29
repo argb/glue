@@ -2,19 +2,19 @@ package repl
 
 import (
 	"bufio"
+	"fmt"
+	"github.com/fatih/color"
 	"glue/compiler"
 	"glue/lexer"
 	"glue/object"
 	"glue/parser"
 	"glue/vm"
-	"fmt"
-	"github.com/fatih/color"
 	"io"
 )
 
 const PROMPT = ">>"
 const POEM = `
-鹅，鹅，鹅，曲项向天歌，白毛浮绿水，红掌拨清波。
+I am Glue!
 `
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
