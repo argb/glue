@@ -63,7 +63,6 @@ func (pe *ParseError) String() string {
 	builder.WriteString(":")
 	builder.WriteString(strconv.Itoa(colNum))
 	builder.WriteString("]")
-	builder.Cap()
 
 	return builder.String()
 }

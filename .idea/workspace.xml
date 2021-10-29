@@ -5,27 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/examples/bytecode.t5" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/t6.gl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/t7.gl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/t8.gl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/io_helpers.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/log/log_helper.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trivial/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compiler/compiler.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/compiler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/docs/readme.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/vm.txt" beforeDir="false" afterPath="$PROJECT_DIR$/docs/vm.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/fib.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/fib.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/t4.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t4.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/t5.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t5.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/glue" beforeDir="false" afterPath="$PROJECT_DIR$/glue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/lexer.go" beforeDir="false" afterPath="$PROJECT_DIR$/lexer/lexer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/repl/repl.go" beforeDir="false" afterPath="$PROJECT_DIR$/repl/repl.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/token/token.go" beforeDir="false" afterPath="$PROJECT_DIR$/token/token.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vm/vm.go" beforeDir="false" afterPath="$PROJECT_DIR$/vm/vm.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/readme.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
