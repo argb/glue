@@ -52,7 +52,7 @@ func main() {
 		if len(args) == 0 {
 			fmt.Println("请指定源文件，示例：")
 			fmt.Println("./glue helloworld.gl")
-			return
+			//return
 		}else {
 			iptFile = args[0]
 		}
@@ -60,7 +60,7 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	//iptFile = "./examples/t5.gl"
+	iptFile = "./examples/t8.gl"
 	fmt.Println(iptFile)
 	log.Infof("source file: %s", iptFile)
 
