@@ -9,6 +9,45 @@
 语句的结束标志是分号（；），如果语句的解析开始之后，一直没有读取到分号，则视为非法语句。
 表达式语句（赋值语句）： 标志符 = 表达式;
 表达式语句不产生值，但是其中的表达式可以产生值，并赋值给左侧标志符。
+<params> ::= (<expression list>)
+<arguments> ::= (<expression list>)
+<expression list> ::= <expression>|<expression>,<expression tail>
+<expression tail> ::= <expression>,<expression>...
+<expression> ::= <prefix expression>|<infix expression>
+<prefix expression> ::= <prefix operator><operand>
+<prefix operator> ::= - | ! | ( | [ | { | ε
+这里稍微说明下，只要不是中缀表达式运算符，其他的表达式成分都看做前缀表达式，或者ε(epsilon)运算符,这个ε是我自己引入的一个概念
+主要是因为这里涉及的表达式解析算法TDOP,引入ε这个概念只是为了更好的形式化描述这个算法。
+ε这里代表什么含义呢？
+表示这个运算符是个空操作，不进行实际的运算，直接跟后边的的operand结合。
+再举个栗子，比如下面这两个表达式：
+-10，ε10，
+先看第一个-10:
+operator: -
+operand 10
+负号跟数字10发生运算，产生一个结果-10
+而第二个表达式 ε10，
+operator: ε
+operand: 10
+ε这里就是啥也不干，直接取后边的10，解析结果就是10.
+当然实际代码实现中并不会出现ε，只是处理逻辑上相当于有个ε，因为处理逻辑跟-10是用的同一套逻辑，引入这ε只是为了说明这样处理合理性，
+相当于这里有个啥也不干的运算符。
+<operand> ::= Identifier|<kinds of literals>
+<infix expression> ::= <prefix expression><infix operator><expression>
+<infix operator> ::= + | - | * | / | ( | > | < | == | != | = | [
+(, 这里表示函数调用
+[, 数组索引取元素
+这些都看做中缀表达式，或者二元表达式
+可能大家觉得这里为什么跟前缀表达式有重复，确实是有重复，但是不影响解析，因为他们前后有其他约束，也就是他们通常是其它成分的一部分，
+所以可以消除这部分不确定性。
+
+
+<array literal> := [<expression list>]
+
+哈希字面量的定义其实跟<expression list>差不多，只是把其中的分隔符换一下。
+<hash literal> ::= {<hash pair>|<hash pair>,<hash literal tail>}
+<hash literal tail> ::= <hash pair>,<hash pair>,...
+<hash pari> ::= <expression : expression> // key部分可以直接限定为Identifier, <Identifier : expression>
 
 表达式种类：
 字面量表达式->数字，字符串，数组，哈希对象
@@ -46,18 +85,12 @@ if (<expression>) <consequence> else <alternative>
 字符串：
 <sequence of characters>
 
-数组：
-[<expression list>]
-<expression list> := <expression>,<expression list>|ε
-
-哈希：
-{<expression> : <expression>, <expression> : <expression>, ... }
 
 声明语句：
-let <identifier>;
+let <identifier> = <expression>;
 
 赋值语句：
-identifier = <expression>;
+<identifier> = <expression>;
 
 todo:
 1、支持三元表达，可通过if表达式改造而来

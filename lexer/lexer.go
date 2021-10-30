@@ -19,8 +19,8 @@ type Lexer struct {
 	ch byte
 	char string // for debug, the string format of ch
 
-	currLineNum int
-	currColNum int
+	CurrLineNum int // always point to next usable line
+	CurrColNum int
 
 	lines []string
 }
@@ -51,8 +51,8 @@ func NewFromFile(filename string) *Lexer {
 		log.ErrorF("load src file %s failed, error:%s", filename, err)
 		panic(err)
 	}
-	l.currLineNum = 0
-	l.currColNum = 0
+	l.CurrLineNum = 0
+	l.CurrColNum = 0
 
 	l.readChar() // init read cursor
 
@@ -89,10 +89,10 @@ func (l *Lexer) readChar() {
 	l.readPosition +=1
 
 	if l.position >= lineLen {
-		l.currColNum = lineLen
+		l.CurrColNum = lineLen
 
 	}else {
-		l.currColNum = l.position
+		l.CurrColNum = l.position
 	}
 
 }
@@ -119,13 +119,13 @@ func (l *Lexer)readLine() error {
 	if len(l.lines) == 0 {
 		return fmt.Errorf("没有可加载内容") // 抛出一个报错信号，通知readChar整个多行文件的数据读取完毕，类似EOF的作用
 	}
-	if l.currLineNum >= len(l.lines) {
+	if l.CurrLineNum >= len(l.lines) {
 		return fmt.Errorf("没有可加载内容")
 	}else {
-		l.input = l.lines[l.currLineNum]
+		l.input = l.lines[l.CurrLineNum]
 	}
 
-	l.currLineNum++
+	l.CurrLineNum++
 
 	return nil
 }
@@ -280,8 +280,8 @@ func (l *Lexer) newToken(tokenType token.TokenType, char byte) token.Token {
 		Type: tokenType,
 		Literal: string(char),
 
-		LineNum: l.currLineNum,
-		ColumnNum: l.currColNum,
+		LineNum: l.CurrLineNum,
+		ColumnNum: l.CurrColNum,
 	}
 }
 

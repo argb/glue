@@ -49,15 +49,20 @@ type ParseError struct {
 func (pe *ParseError) String() string {
 	var builder strings.Builder
 	var lineNum, colNum int
+	var tokenInfo string
+
+	builder.Grow(200) // 初始化一下，避免过多内存分配次数
+
 	if pe.Token != nil {
-		lineNum = pe.Token.LineNum
-		colNum = pe.Token.ColumnNum
-	}else{
-		lineNum = pe.LineNum
-		colNum = pe.ColNum
+		tokenInfo = pe.Token.Literal
 	}
+	lineNum = pe.LineNum
+	colNum = pe.ColNum
 	builder.Grow(100)
 	builder.WriteString(pe.msg)
+	builder.WriteString("[Token:")
+	builder.WriteString(tokenInfo)
+	builder.WriteString("]")
 	builder.WriteString("[")
 	builder.WriteString(string(strconv.Itoa(lineNum)))
 	builder.WriteString(":")
@@ -83,6 +88,9 @@ type Parser struct {
 
 	prefixParserFns map[token.TokenType]prefixParserFn
 	infixParseFns map[token.TokenType]infixParseFn
+
+	currLineNum int
+	currColNum int
 }
 
 type (
@@ -147,7 +155,7 @@ func (p *Parser) parseWhileStatement() *ast.WhileStatement {
 	}
 
 	if !p.expectPeek(token.RPAREN) {
-		//p.peekError(token.RPAREN)
+
 		return nil
 	}
 	if !p.expectPeek(token.LBRACE) {
@@ -279,6 +287,8 @@ func (p *Parser) ReportParseErrors() {
 func (p *Parser) peekError(t token.TokenType) {
 	pErr := new(ParseError)
 	pErr.Token = &p.curToken
+	pErr.LineNum = p.l.CurrLineNum
+	pErr.ColNum = p.l.CurrColNum
 	msg := fmt.Sprintf("expected next token to be %s, got %s instead.", t, p.peekToken.Type)
 	pErr.msg = msg
 
@@ -306,13 +316,16 @@ func (p *Parser) nextToken() {
 
 /*
 向前看一步，符合预期就向前走一步，否则原地不动, 可以看做向前看与向前走的合体逻辑
+函数名约定：以expect开头，比如expectXXX，表示必须出现期望的token，否则就认为发生了错误。 如果单纯的是探测一下下一个token是啥，
+不要用这个函数，可以使用peekTokenIs。
+这样是为了进行正确的错误处理，以及给出正确错误位置。
  */
 func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t){
 		p.nextToken()
 		return true
 	}else {
-		// 这个报错信息主要是开始测试用例使用过，现在不应该有了，因为不算是个错误，只是个判断封装
+		// 不是预期token就报错
 		p.peekError(t)
 		return false
 	}
@@ -390,11 +403,15 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 }
 
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
-	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	msg := fmt.Sprintf("no prefix parse function for %q found.", t)
 	//fmt.Printf("token:%#v, token-literal:%s\n", t, p.curToken.Literal)
 	//fmt.Println(msg)
 	pErr := new(ParseError)
+
 	pErr.Token = &p.curToken
+	pErr.LineNum = p.l.CurrLineNum
+	pErr.ColNum = p.l.CurrColNum
+
 	pErr.msg = msg
 
 	p.errors = append(p.errors, pErr.String())
@@ -493,6 +510,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
 
 	if !p.expectPeek(token.IDENT) {
+
 		return nil
 	}
 
@@ -507,6 +525,8 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 			return stmt
 		}
 		//fmt.Println("从这里返回了")
+
+		p.peekError(token.ASSIGN)
 
 		return nil
 	}
