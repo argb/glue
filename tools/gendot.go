@@ -3,11 +3,13 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
+	"glue/ast"
 	"glue/lexer"
 	"glue/parser"
-	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -50,4 +52,27 @@ func genFile(src string) {
 	writer.WriteString(src)
 
 	writer.Flush()
+}
+
+type handler func(v ...interface{})
+
+func gen(start, end ast.Node) {
+	b := strings.Builder{}
+	switch node := start.(type) {
+	case ast.Expression:
+		b.WriteString(node.String())
+	}
+
+	b.WriteString("->")
+
+	switch node := end.(type) {
+	case ast.Expression:
+		b.WriteString(node.String())
+	}
+
+}
+
+
+func walk(program ast.Program, handle handler) {
+
 }

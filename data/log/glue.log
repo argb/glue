@@ -14,3 +14,43 @@
 [INFO]2021/10/30 15:36:33 log_helper.go:48: source file: ./examples/t8.gl
 [INFO]2021/10/30 15:44:02 log_helper.go:48: source file: ./examples/t8.gl
 [INFO]2021/10/30 15:44:29 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 17:58:36 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 17:58:56 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 17:59:26 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:00:03 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:00:28 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:01:03 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:03:05 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:03:36 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:04:53 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:05:13 log_helper.go:48: source file: ./examples/t8.gl
+[ERROR]2021/10/30 18:05:13 log_helper.go:56: error undefined variable c
+[INFO]2021/10/30 18:07:19 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:07:31 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:07:47 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:08:13 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:08:39 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:09:25 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:09:36 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:31:33 log_helper.go:48: source file: ./examples/t8.gl
+[ERROR]2021/10/30 18:31:33 log_helper.go:56: error undefined variable f
+[INFO]2021/10/30 18:31:44 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:32:19 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:32:32 log_helper.go:48: source file: ./examples/t8.gl
+[ERROR]2021/10/30 18:32:32 log_helper.go:56: error got nil operand, sp: 2
+[INFO]2021/10/30 18:37:24 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/30 18:55:26 log_helper.go:48: source file: ./examples/t8.gl
+[ERROR]2021/10/30 18:55:26 log_helper.go:56: error calling non-function and non-builtin
+[INFO]2021/10/31 00:51:55 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/31 00:52:19 log_helper.go:48: source file: ./examples/t8.gl
+[INFO]2021/10/31 01:54:31 log_helper.go:54: source file: ./examples/t8.gl
+[INFO]2021/10/31 01:55:24 log_helper.go:54: source file: ./examples/t8.gl
+[ERROR]2021/10/31 01:55:24 log_helper.go:68: error undefined variable x
+[INFO]2021/10/31 01:55:39 log_helper.go:54: source file: ./examples/t8.gl
+[ERROR]2021/10/31 01:55:39 log_helper.go:68: error undefined variable x
+[INFO]2021/10/31 01:56:30 log_helper.go:54: source file: ./examples/t8.gl
+[INFO]2021/10/31 01:57:39 log_helper.go:54: source file: ./examples/t8.gl
+[INFO]2021/10/31 01:58:31 log_helper.go:54: source file: ./examples/t8.gl
+[ERROR]2021/10/31 01:58:31 log_helper.go:68: error unsupported types for binary operation: STRING, INTEGER
+[INFO]2021/10/31 01:59:20 log_helper.go:54: source file: ./examples/t8.gl
+[INFO]2021/10/31 02:00:43 log_helper.go:54: source file: ./examples/t8.gl

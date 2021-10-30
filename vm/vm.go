@@ -65,6 +65,18 @@ type VM struct {
 	frameIndex int // always pointing to the next available frame, equals len(frames)
 }
 
+type RuntimeError struct {
+	opcode code.Opcode
+	operands object.Object
+	msg string
+}
+
+func (re *RuntimeError) Error() string {
+	re.msg = fmt.Sprintf("invalid operation. opcode:%q", re.opcode)
+
+	return re.msg
+}
+
 // RuntimeInfo /**
 /*
 For debug
@@ -193,7 +205,7 @@ func (vm *VM) Run() error {
 		op = code.Opcode(instructions[ip])
 
 		// for debug
-		fmt.Print(code.FmtInstruction(instructions, ip))
+		//fmt.Print(code.FmtInstruction(instructions, ip))
 
 		//mn.AddInstruction(code.FmtInstruction(instructions, ip)) // for debug
 
@@ -436,7 +448,7 @@ func (vm *VM) pushClosure(constIndex int, numFree int) error {
 
 func (vm *VM) executeCall(numArgs int) error {
 	callee := vm.stack[vm.sp-1-numArgs]
-	fmt.Println(callee.Inspect())
+	//fmt.Println(callee.Inspect())
 	/*
 	for _, item := range vm.stack[0:3] {
 		println(item.Inspect())

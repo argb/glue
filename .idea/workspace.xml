@@ -6,12 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ast/ast.go" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ast.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/benchmark/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/benchmark/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/log/glue.log" beforeDir="false" afterPath="$PROJECT_DIR$/data/log/glue.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/t1.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t1.gl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/t8.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t8.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grammars/bugs.txt" beforeDir="false" afterPath="$PROJECT_DIR$/grammars/bugs.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grammars/grammars.txt" beforeDir="false" afterPath="$PROJECT_DIR$/grammars/grammars.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lexer/lexer.go" beforeDir="false" afterPath="$PROJECT_DIR$/lexer/lexer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gendot.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/gendot.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/log/log_helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/log/log_helper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trivial/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/trivial/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vm/vm.go" beforeDir="false" afterPath="$PROJECT_DIR$/vm/vm.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,16 +118,6 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/vm/vm.go</url>
-          <line>192</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/compiler/compiler.go</url>
-          <line>277</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/compiler/symbol_table.go</url>
           <line>60</line>
           <option name="timeStamp" value="10" />
@@ -131,11 +126,6 @@
           <url>file://$PROJECT_DIR$/compiler/symbol_table.go</url>
           <line>101</line>
           <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/parser/parser.go</url>
-          <line>287</line>
-          <option name="timeStamp" value="12" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

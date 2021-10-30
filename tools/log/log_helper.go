@@ -26,7 +26,7 @@ var (
 	defaultLogFile = "./data/log/glue.log"
 )
 
-func init() {
+func setUp() {
 	var err error
 	logFile, err = os.OpenFile(defaultLogFile, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
@@ -41,18 +41,30 @@ func init() {
 }
 
 func Debugf(format string, v ...interface{}) {
+	if debugLogger == nil {
+		setUp()
+	}
 	debugLogger.Printf(format, v...)
 }
 
 func Infof(format string, v ...interface{}) {
+	if debugLogger == nil {
+		setUp()
+	}
 	infoLogger.Printf(format, v...)
 }
 
 func Warningf(format string, v ...interface{}) {
+	if debugLogger == nil {
+		setUp()
+	}
 	warningLogger.Printf(format, v...)
 }
 
 func ErrorF(format string, v ...interface{}) {
+	if debugLogger == nil {
+		setUp()
+	}
 	errorLogger.Printf(format, v...)
 }
 

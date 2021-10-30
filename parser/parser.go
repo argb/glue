@@ -200,7 +200,8 @@ func (p *Parser) parseHashLiteral2() ast.Expression {
 	hash := &ast.HashLiteral{Token: p.curToken}
 	hash.Pairs = make(map[ast.Expression]ast.Expression)
 
-	if p.expectPeek(token.RBRACE) {
+	if p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
 		return hash
 	}
 
@@ -213,7 +214,8 @@ func (p *Parser) parseHashLiteral2() ast.Expression {
 		p.nextToken()
 		value := p.parseExpression(LOWEST)
 		hash.Pairs[key] = value
-	if p.expectPeek(token.COMMA) {
+	if p.peekTokenIs(token.COMMA) {
+		p.nextToken()
 		goto label
 	}else if p.expectPeek(token.RBRACE) {
 		return hash
@@ -284,6 +286,13 @@ func (p *Parser) ReportParseErrors() {
 	}
 }
 
+func (p *Parser) addParseError(pErr *ParseError) {
+	pErr.LineNum = p.l.CurrLineNum
+	pErr.ColNum = p.l.CurrColNum
+
+	p.errors = append(p.errors, pErr.String())
+}
+
 func (p *Parser) peekError(t token.TokenType) {
 	pErr := new(ParseError)
 	pErr.Token = &p.curToken
@@ -348,8 +357,13 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 			//fmt.Printf("I am not nil, I am %#v,my value is %s",stmt, stmt.String())
 			program.Statements = append(program.Statements, stmt)
+
 		}else{
-			fmt.Println("I am nil", stmt)
+			pErr := new(ParseError)
+			pErr.msg = fmt.Sprintf("can't parse statement.")
+			p.addParseError(pErr)
+
+			//fmt.Println("I am nil", stmt)
 		}
 		p.nextToken()
 	}

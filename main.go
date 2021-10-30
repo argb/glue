@@ -22,6 +22,7 @@ import (
 )
 
 func main() {
+
 	currUser, err := user.Current()
 	if err != nil {
 		panic(err)

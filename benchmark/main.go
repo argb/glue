@@ -1,14 +1,14 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"glue/compiler"
 	"glue/evaluator"
 	"glue/lexer"
 	"glue/object"
 	"glue/parser"
 	"glue/vm"
-	"flag"
-	"fmt"
 	"time"
 )
 

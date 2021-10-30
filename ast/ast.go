@@ -46,6 +46,7 @@ type LetStatement struct {
 	Token token.Token
 	Name *Identifier
 	Value Expression
+	_children []*Node
 }
 
 type Identifier struct {

@@ -9,7 +9,7 @@ let map = fn(arr, f) {
     return iter(arr, []);
 };
 
-let a = [1, 2, 3, 4, 5];
+let a = [1, 2, 3, 4];
 
 let double = fn(x) {
     return x * 2;
