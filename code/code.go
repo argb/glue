@@ -40,6 +40,7 @@ const (
 	OpGetBuiltin
 	OpClosure
 	OpGetFree
+	OpCurrentClosure
 )
 
 type Definition struct {
@@ -77,6 +78,7 @@ var definitions = map[Opcode]*Definition{
 	OpGetBuiltin: {"OpGetBuiltin", []int{1}}, //操作数是object.builtins包中Builtins数组的索引，这个直接拿来给VM用了
 	OpClosure: {"OpClosure", []int{2,1}},
 	OpGetFree: {"OpGetFree", []int{1}},
+	OpCurrentClosure: { "OpCurrentClosure", []int{}}, // 处理闭包递归的问题
 }
 
 func Lookup(op byte) (*Definition, error) {

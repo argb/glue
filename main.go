@@ -61,7 +61,7 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	iptFile = "./examples/t8.gl"
+	//iptFile = "./examples/t9.gl"
 	fmt.Println(iptFile)
 	log.Infof("source file: %s", iptFile)
 

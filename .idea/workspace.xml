@@ -5,17 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/examples/t9.gl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ast/ast.go" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ast.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/benchmark/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/benchmark/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/code.go" beforeDir="false" afterPath="$PROJECT_DIR$/code/code.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compiler/compiler.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/compiler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compiler/compiler_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/compiler_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compiler/symbol_table.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/symbol_table.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compiler/symbol_table_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/symbol_table_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/log/glue.log" beforeDir="false" afterPath="$PROJECT_DIR$/data/log/glue.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/t1.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t1.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/t8.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t8.gl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/parser.txt" beforeDir="false" afterPath="$PROJECT_DIR$/docs/parser.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/fib.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/fib.gl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/gendot.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/gendot.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/log/log_helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/log/log_helper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trivial/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/trivial/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser/parser_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vm/vm.go" beforeDir="false" afterPath="$PROJECT_DIR$/vm/vm.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,7 +70,7 @@
       <recent name="$PROJECT_DIR$/tools/log" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build glue">
+  <component name="RunManager" selected="Go Test.TestRecursiveFunctions in glue/compiler">
     <configuration name="go build glue" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$" />
@@ -86,8 +89,47 @@
       <filePath value="$PROJECT_DIR$/trivial/main.go" />
       <method v="2" />
     </configuration>
+    <configuration name="TestFunctionLiteralWithName in glue/parser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="glue" />
+      <working_directory value="$PROJECT_DIR$/parser" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="glue/parser" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestFunctionLiteralWithName\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestRecursiveFunctions in glue/compiler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="glue" />
+      <working_directory value="$PROJECT_DIR$/compiler" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="glue/compiler" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRecursiveFunctions\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestShadowingFunctionName in glue/compiler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="glue" />
+      <working_directory value="$PROJECT_DIR$/compiler" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="glue/compiler" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestShadowingFunctionName\E$" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestRecursiveFunctions in glue/compiler" />
+        <item itemvalue="Go Test.TestFunctionLiteralWithName in glue/parser" />
+        <item itemvalue="Go Test.TestShadowingFunctionName in glue/compiler" />
         <item itemvalue="Go Build.go build glue" />
         <item itemvalue="Go Build.go build glue/trivial" />
       </list>
@@ -115,20 +157,6 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/compiler/symbol_table.go</url>
-          <line>60</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/compiler/symbol_table.go</url>
-          <line>101</line>
-          <option name="timeStamp" value="11" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="c.scopes[c.scopeIndex].instructions.String()" language="go" />

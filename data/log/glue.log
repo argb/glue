@@ -54,3 +54,7 @@
 [ERROR]2021/10/31 01:58:31 log_helper.go:68: error unsupported types for binary operation: STRING, INTEGER
 [INFO]2021/10/31 01:59:20 log_helper.go:54: source file: ./examples/t8.gl
 [INFO]2021/10/31 02:00:43 log_helper.go:54: source file: ./examples/t8.gl
+[INFO]2021/10/31 02:34:37 log_helper.go:54: source file: ./examples/t8.gl
+[INFO]2021/10/31 02:35:53 log_helper.go:54: source file: ./examples/t9.gl
+[ERROR]2021/10/31 02:35:53 log_helper.go:68: error got nil operand, sp: 3
+[INFO]2021/10/31 05:20:15 log_helper.go:54: source file: ./examples/t9.gl
