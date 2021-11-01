@@ -61,7 +61,7 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	//iptFile = "./examples/t9.gl"
+	iptFile = "./examples/t3.gl"
 	fmt.Println(iptFile)
 	log.Infof("source file: %s", iptFile)
 
@@ -82,8 +82,10 @@ func main() {
 			log.ErrorF("error %s", err)
 			panic(err)
 		}
+		c.Info()
 		//fmt.Println("instructions:", c.Bytecode().Instructions.String())
 		machine := vm.New(c.Bytecode())
+
 		err = machine.Run()
 		if err != nil {
 			log.ErrorF("error %s", err)

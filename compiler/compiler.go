@@ -59,6 +59,19 @@ func New() *Compiler {
 	}
 }
 
+func (c *Compiler) Info() {
+	fmt.Printf("scopes len: %#v\n",len(c.scopes))
+	var i int
+	if c.symbolTable != nil {
+		i++
+	}
+	for c.symbolTable.Outer != nil {
+		c.symbolTable = c.symbolTable.Outer
+		i++
+	}
+	fmt.Printf("symbolTables len: %#v\n", i)
+}
+
 func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
 	compiler := New()
 	compiler.symbolTable = s
