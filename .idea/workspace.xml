@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/docs/prologue.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compiler/compiler.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/compiler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/log/glue.log" beforeDir="false" afterPath="$PROJECT_DIR$/data/log/glue.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/t3.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t3.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trivial/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/trivial/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ast.dot" beforeDir="false" afterPath="$PROJECT_DIR$/ast.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gendot.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/gendot.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +58,7 @@
       <recent name="$PROJECT_DIR$/tools/log" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build glue">
+  <component name="RunManager" selected="Go Build.go build glue/tools">
     <configuration name="go build glue" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$" />
@@ -73,13 +68,13 @@
       <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build glue/trivial" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="go build glue/tools" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="glue/trivial" />
+      <package value="glue/tools" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/trivial/main.go" />
+      <filePath value="$PROJECT_DIR$/tools/gendot.go" />
       <method v="2" />
     </configuration>
     <configuration name="TestFunctionLiteralWithName in glue/parser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -120,11 +115,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build glue/tools" />
         <item itemvalue="Go Build.go build glue" />
         <item itemvalue="Go Test.TestRecursiveFunctions in glue/compiler" />
         <item itemvalue="Go Test.TestFunctionLiteralWithName in glue/parser" />
         <item itemvalue="Go Test.TestShadowingFunctionName in glue/compiler" />
-        <item itemvalue="Go Build.go build glue/trivial" />
       </list>
     </recent_temporary>
   </component>
