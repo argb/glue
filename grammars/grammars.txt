@@ -91,6 +91,8 @@ let <identifier> = <expression>;
 
 赋值语句：
 <identifier> = <expression>;
+函数定义语句
+<function definition> ::= fn <identifier>(<parameter list>) <block statement>
 
 todo:
 1、支持三元表达，可通过if表达式改造而来

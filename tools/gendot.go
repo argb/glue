@@ -15,6 +15,10 @@ var Index int64 = 0
 
 func main() {
 	input :=`
+fn sub(x,y){
+	let z=x-y
+	return z;
+}
 let a=10;
 let d=-a+(b+c)*6*-1+add(a,10)/9;
 if(!(a>b)){
@@ -165,6 +169,10 @@ func walk(node ast.Node, lines *[]string) {
 
 		*lines = append(*lines, genEdgeToNode(node, node.ReturnValue))
 		walk(node.ReturnValue, lines)
+	case *ast.FunctionDefinitionStatement:
+		*lines = append(*lines, genEdgeToNode(node, node.FnLiteral))
+		walk(node.FnLiteral, lines)
+
 	case *ast.IfExpression:
 		//*lines = append(*lines, genNode(node))
 
@@ -225,6 +233,10 @@ func walk(node ast.Node, lines *[]string) {
 		return
 	case *ast.FunctionLiteral:
 		*lines = append(*lines, genEdgeToLeaf(node, "fn"))
+		if node.Name != nil && node.From == ast.STATEMENT {
+			*lines = append(*lines, genEdgeToNode(node, node.Name))
+			walk(node.Name, lines)
+		}
 
 		*lines = append(*lines, genEdgeToLeaf(node, "("))
 

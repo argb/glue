@@ -387,6 +387,11 @@ func (p *Parser) parseStatement() ast.Statement {
 		//return p.parseAssignStatement()
 	case token.WHILE:
 		return p.parseWhileStatement()
+	case token.FUNCTION:
+		if p.peekTokenIs(token.IDENT) {
+			return p.parseFunctionDefinitionStatement()
+		}
+		return p.parseExpressionStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -558,7 +563,11 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt.Value = p.parseExpression(LOWEST)
 
 	if fl, ok := stmt.Value.(*ast.FunctionLiteral); ok {
-		fl.Name = stmt.Name.Value
+		//fl.Name = stmt.Name.Value
+		//复制一份，更新Id，否则画图出错
+		name := &ast.Identifier{Token: stmt.Name.Token, Value: stmt.Name.Value, Id: getNodeIndex()}
+		fl.Name = name
+		fl.From = ast.EXPRESSION
 	}
 
 	for p.peekTokenIs(token.SEMICOLON) {
@@ -672,6 +681,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	ident := &ast.Identifier{
 		Token: p.curToken,
 		Value: p.curToken.Literal,
+		Id: getNodeIndex(),
 	}
 	identifiers = append(identifiers, ident)
 
@@ -729,4 +739,36 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 
 func (p *Parser) parseStringLiteral() ast.Expression {
 	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal, Id: getNodeIndex()}
+}
+
+func (p *Parser) parseFunctionDefinitionStatement() *ast.FunctionDefinitionStatement {
+	fnLiteral := &ast.FunctionLiteral{
+		Token: p.curToken,
+		Id: getNodeIndex(),
+		From: ast.STATEMENT,
+	}
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+	fnLiteral.Name = &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+		Id: getNodeIndex(),
+	}
+	p.nextToken()
+
+	params := p.parseFunctionParameters()
+	fnLiteral.Parameters = params
+
+	p.nextToken()
+	body := p.parseBlockStatement()
+	fnLiteral.Body = body
+
+	fnStatement := &ast.FunctionDefinitionStatement{
+		Id: getNodeIndex(),
+		Token: p.curToken,
+		FnLiteral: fnLiteral,
+	}
+
+	return fnStatement
 }

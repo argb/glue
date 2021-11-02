@@ -843,7 +843,7 @@ func TestFunctionLiteralWithName(t *testing.T) {
 		t.Fatalf("stmt.Value is not ast.FunctionLiteral. got=%T",
 			stmt.Value)
 	}
-	if function.Name != "myFunction" {
+	if function.Name.String() != "myFunction" {
 		t.Fatalf("function literal name wrong. want 'myFunction', got=%q\n",
 			function.Name)
 	}

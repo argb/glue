@@ -292,7 +292,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.FunctionLiteral:
 		c.enterScope()
 
-		if node.Name != "" {
+		if node.Name != nil {
 			// to solve self-reference problem
 			// 编译函数字面量一开始先把自己加到符号表，作用域为FunctionScope,这样自引用的变量就可以从当前符号表找到信息了，
 			// 也就是说存在于当前符号表了，也就不会被标记为自由变量了，这样就不会出现："构造自己时引用一个不存在的自己"这样的
@@ -301,7 +301,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			// 才会实际执行，OpCall指令执行的时候，Closure应经构造完成，并且OpCall指令会将其挂到当前的Stack Frame上，所以
 			// OpCurrentClosure执行的时候直接从当前的stack frame把表示当前正在执行的Closure直接加载到主stack上。
 			// 这样就解决了之前出现的自由变量自引用的导致VM崩掉的bug
-			c.symbolTable.DefineFunctionName(node.Name)
+			c.symbolTable.DefineFunctionName(node.Name.Value)
 		}
 
 		for _, p := range node.Parameters {

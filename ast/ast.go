@@ -30,6 +30,7 @@ const (
 	ASSIGNSTATEMENT NodeType = "ASSIGNSTATEMENT"
 	ASSIGNEXPRESSION NodeType = "ASSIGNEXPRESSION"
 	WHILESTATEMENT NodeType = "WHILESTATEMENT"
+	FUNCTIONDEFINITIONSTATEMENT NodeType = "FUNCTIONDEFINITIONSTATEMENT"
 
 )
 
@@ -357,14 +358,21 @@ func (this *BlockStatement) Tag() string {
 	return fmt.Sprintf("[%s]%d", BLOCKSTATEMENT, this.Id)
 }
 
+const (
+	EXPRESSION int64 = iota
+	STATEMENT
+)
+
 type FunctionLiteral struct {
 	Token token.Token // The 'fn' token
 	Parameters [] *Identifier
 	Body *BlockStatement
 
-	Name string // function name,which mainly used to handle the closure-recursion problem
+	Name *Identifier // function name,which mainly used to handle the closure-recursion problem
 
 	Id int64
+
+	From int64
 }
 
 func (fl *FunctionLiteral) expressionNode() {
@@ -386,7 +394,7 @@ func (fl *FunctionLiteral) String() string {
 		params = append(params, p.String())
 	}
 	out.WriteString(fl.TokenLiteral())
-	if fl.Name != "" {
+	if fl.Name != nil {
 		out.WriteString(fmt.Sprintf("<%s>", fl.Name))
 	}
 	out.WriteString("(")
@@ -643,4 +651,34 @@ func (ws *WhileStatement) String() string {
 
 func (this *WhileStatement) Tag() string {
 	return fmt.Sprintf("[%s]%d", WHILESTATEMENT, this.Id)
+}
+
+type FunctionDefinitionStatement struct {
+	Name *Identifier
+	Token token.Token
+	Parameters [] *Identifier
+	Body *BlockStatement
+	Id int64
+	FnLiteral *FunctionLiteral
+}
+
+func (this *FunctionDefinitionStatement) statementNode()  {
+
+}
+
+func (this *FunctionDefinitionStatement) TokenLiteral() string {
+	return this.Token.Literal
+}
+
+func (this *FunctionDefinitionStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(this.FnLiteral.String())
+
+	return out.String()
+}
+
+func (this *FunctionDefinitionStatement) Tag() string {
+
+	return fmt.Sprintf("[%s]%d", FUNCTIONDEFINITIONSTATEMENT, this.Id)
 }
