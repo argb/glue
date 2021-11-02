@@ -3,11 +3,17 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 func main() {
 	//log.WriteLog()
-	tt()
+	//tt()
+	t2()
+}
+
+func t2() {
+	fmt.Println(time.Now().Unix())
 }
 
 func t1() {

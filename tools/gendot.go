@@ -8,18 +8,15 @@ import (
 	"glue/ast"
 	"glue/lexer"
 	"glue/parser"
-	"glue/token"
 	"os"
 	"strings"
 )
+var Index int64 = 0
 
 func main() {
 	input :=`
 let a=10;
-let b= 100;
-let c= a+b;
-let b=100;
-let a=10;
+let d=a+b+c*6/9
 `
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -33,9 +30,9 @@ let a=10;
 	dotSrc.WriteString("digraph ast {\n")
 	dotSrc.WriteString(`label = "program";`)
 	dotSrc.WriteString("\n")
-	dotSrc.WriteString("program;\n")
 
 	walk(program, &lines)
+
 	body := strings.Join(lines, "\n")
 	dotSrc.WriteString(body)
 
@@ -65,17 +62,36 @@ func md5v1(str string) string {
 	return md5str
 }
 
-func gen(start, end ast.Node) string {
+func genEdgeToNode(start, end ast.Node) string {
 	b := strings.Builder{}
 	b.WriteString("\"")
-	b.WriteString(md5v1(start.String()))
+	b.WriteString(start.Tag())
+
 	b.WriteString("\"")
 
 	b.WriteString("->")
 
 	b.WriteString("\"")
-	b.WriteString(md5v1(end.String()))
+	b.WriteString(end.Tag())
 	b.WriteString("\"")
+	b.WriteString(";")
+
+	return b.String()
+}
+
+func genEdgeToLeaf(start ast.Node, leaf interface{}) string {
+	b := strings.Builder{}
+	b.WriteString("\"")
+	b.WriteString(start.Tag())
+
+	b.WriteString("\"")
+
+	b.WriteString("->")
+
+	b.WriteString("\"")
+	b.WriteString(genLeaf(leaf))
+	b.WriteString("\"")
+
 	b.WriteString(";")
 
 	return b.String()
@@ -83,57 +99,89 @@ func gen(start, end ast.Node) string {
 
 func genNode(node ast.Node) string {
 
-	return "\""+md5v1(node.String())+"\""
+	return "\""+node.Tag()+"\""
+}
+
+func genLeaf(obj interface{}) string {
+	switch obj.(type) {
+	case int64:
+		value := obj
+
+		Index++
+		return fmt.Sprintf("[%d]l%d", value, Index)
+	case string:
+		value := obj
+		Index++
+		return fmt.Sprintf("[%s]l%d", value, Index)
+	case bool:
+		value := obj
+		Index++
+		return fmt.Sprintf("[%b]l%b", value, Index)
+	default:
+		return ""
+	}
 }
 
 
 func walk(node ast.Node, lines *[]string) {
 	switch node := node.(type) {
 	case *ast.Program:
-		*lines = append(*lines, genNode(node))
+
+		//nodeId := "program["+fmt.Sprintf("%d", node.Id)+"];"
+		//*lines = append(*lines, genNode(node))
 		for _, statement := range node.Statements{
-			*lines = append(*lines, gen(node, statement))
+			*lines = append(*lines, genEdgeToNode(node, statement))
 			walk(statement,lines)
 		}
 	case *ast.IfExpression:
-		*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genNode(node))
 
-		ifToken := token.Token{Type: token.IF, Literal: "if"}
-		ifIdentifier := &ast.Identifier{Token: ifToken, Value: token.IF}
-		gen(node, ifIdentifier)
-
-		*lines = append(*lines, gen(node, node.Condition))
+		*lines = append(*lines, genEdgeToLeaf(node, "if"))
+		*lines = append(*lines, genEdgeToNode(node, node.Condition))
 		walk(node.Condition, lines)
-	case *ast.InfixExpression:
-		*lines = append(*lines, genNode(node))
 
-		gen(node, node.Left)
+	case *ast.InfixExpression:
+		//*lines = append(*lines, genNode(node))
+
+
+		*lines = append(*lines, genEdgeToNode(node, node.Left))
 		walk(node.Left, lines)
 
-		//gen(node, node.Operator)
+		*lines = append(*lines, genEdgeToLeaf(node, node.Operator))
 
-		*lines = append(*lines, gen(node, node.Right))
+		*lines = append(*lines, genEdgeToNode(node, node.Right))
+		walk(node.Right, lines)
+	case *ast.PrefixExpression:
+		*lines = append(*lines, genEdgeToLeaf(node, node.Operator))
 		walk(node.Right, lines)
 
 	case *ast.Identifier:
-		*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genLeaf(node.Value))
+		*lines = append(*lines, genEdgeToLeaf(node, node.Value))
 		return
 	case *ast.LetStatement:
-		*lines = append(*lines, genNode(node))
-
-		*lines = append(*lines, gen(node, node.Name))
+		//*lines = append(*lines, genNode(node))
+		*lines = append(*lines, genEdgeToLeaf(node, "let"))
+		*lines = append(*lines, genEdgeToNode(node, node.Name))
 		walk(node.Name, lines)
 
-		*lines = append(*lines, gen(node, node.Value))
+		*lines = append(*lines, genEdgeToLeaf(node, "="))
+
+		*lines = append(*lines, genEdgeToNode(node, node.Value))
 		walk(node.Value, lines)
 	case *ast.IntegerLiteral:
-		*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genLeaf(node.Value))
+		*lines = append(*lines, genEdgeToLeaf(node, node.Value))
 		return
 	case *ast.StringLiteral:
-		*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genLeaf(node.Value))
+		*lines = append(*lines, genEdgeToLeaf(node, node.Value))
 		return
 	case *ast.BlockStatement:
-		*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genNode(node))
 
 	}
 }

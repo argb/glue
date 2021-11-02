@@ -7,9 +7,37 @@ import (
 	"strings"
 )
 
+type NodeType string
+
+const (
+	PROGRAM NodeType = "PROGRAM"
+	IDENTIFIER NodeType = "IDENTIFIER"
+	LETSTATEMENT NodeType = "LETSTATEMENT"
+	RETURNSTATEMENT NodeType = "RETURNSTATEMENT"
+	EXPRESSIONSTATEMENT NodeType = "EXPRESSIONSTATEMENT"
+	INTEGERLITERAL NodeType = "INTEGERLITERAL"
+	PREFIXEXPRESSION NodeType = "PREFIXEXPRESSION"
+	INFIXEXPRESSION NodeType = "INFIXEXPRESSION"
+	BOOLEAN NodeType = "BOOLEAN"
+	IFEXPRESSION NodeType = "IFEXPRESSION"
+	BLOCKSTATEMENT NodeType = "BLOCKSTATEMENT"
+	FUNCTIONLITERAL NodeType = "FUNCTIONLITERAL"
+	CALLEXPRESSION NodeType = "CALLEXPRESSION"
+	STRINGLITERAL NodeType = "STRINGLITERAL"
+	ARRAYLITERAL NodeType = "ARRAYLITERAL"
+	INDEXEXPRESSION NodeType = "INDEXEXPRESSION"
+	HASHLITERAL NodeType = "HASHLITERAL"
+	ASSIGNSTATEMENT NodeType = "ASSIGNSTATEMENT"
+	ASSIGNEXPRESSION NodeType = "ASSIGNEXPRESSION"
+	WHILESTATEMENT NodeType = "WHILESTATEMENT"
+
+)
+
 type Node interface {
 	TokenLiteral() string
 	String() string
+
+	Tag() string // for drawing ast tree
 }
 
 type Statement interface {
@@ -24,6 +52,8 @@ type Expression interface {
 
 type Program struct {
 	Statements []Statement
+
+	Id int64 //用时间戳表示 time.Now.Unix()
 }
 
 func (p *Program) TokenLiteral() string {
@@ -43,20 +73,37 @@ func (p *Program) String() string {
 	return out.String()
 }
 
-type LetStatement struct {
-	Token token.Token
-	Name *Identifier
-	Value Expression
-	_children []*Node
+func (p *Program) Tag() string {
+	return fmt.Sprintf("[%s]%d", PROGRAM, p.Id)
 }
 
 type Identifier struct {
 	Token token.Token
 	Value string
+	Id int64
 }
 
 func (i *Identifier) String() string {
 	return i.Value
+}
+
+func (i *Identifier) expressionNode() {
+
+}
+
+func (i *Identifier) TokenLiteral() string {
+	return i.Token.Literal
+}
+
+func (this *Identifier) Tag() string {
+	return fmt.Sprintf("[%s]%d", IDENTIFIER, this.Id)
+}
+
+type LetStatement struct {
+	Token token.Token
+	Name *Identifier
+	Value Expression
+	Id int64
 }
 
 func (ls *LetStatement) statementNode() {
@@ -77,21 +124,19 @@ func (ls *LetStatement) String() string {
 
 	return out.String()
 }
+
 func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
 
-func (i *Identifier) expressionNode() {
-
-}
-
-func (i *Identifier) TokenLiteral() string {
-	return i.Token.Literal
+func (this *LetStatement) Tag() string {
+	return fmt.Sprintf("[%s]%d", LETSTATEMENT, this.Id)
 }
 
 type ReturnStatement struct {
 	Token token.Token
 	ReturnValue Expression
+	Id int64
 }
 
 func (rs *ReturnStatement) statementNode() {
@@ -114,9 +159,14 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
+func (this *ReturnStatement) Tag() string {
+	return fmt.Sprintf("[%s]%d", RETURNSTATEMENT, this.Id)
+}
+
 type ExpressionStatement struct {
 	Token token.Token
 	Expression Expression
+	Id int64
 }
 
 func (es *ExpressionStatement) String() string {
@@ -135,9 +185,14 @@ func (es *ExpressionStatement) TokenLiteral() string  {
 	return es.Token.Literal
 }
 
+func (this *ExpressionStatement) Tag() string {
+	return fmt.Sprintf("[%s]%d", EXPRESSIONSTATEMENT, this.Id)
+}
+
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64
+	Id int64
 }
 
 func (il *IntegerLiteral) expressionNode() {
@@ -152,10 +207,15 @@ func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
 
+func (this *IntegerLiteral) Tag() string {
+	return fmt.Sprintf("[%s]%d", INTEGERLITERAL, this.Id)
+}
+
 type PrefixExpression struct {
 	Token token.Token
 	Operator string
 	Right Expression
+	Id int64
 }
 
 func (pe *PrefixExpression) expressionNode() {
@@ -177,11 +237,16 @@ func (pe *PrefixExpression) String() string {
 	return out.String()
 }
 
+func (this *PrefixExpression) Tag() string {
+	return fmt.Sprintf("[%s]%d", PREFIXEXPRESSION, this.Id)
+}
+
 type InfixExpression struct {
 	Token token.Token
 	Left Expression
 	Operator string
 	Right Expression
+	Id int64
 }
 
 func (ie *InfixExpression) expressionNode() {
@@ -203,9 +268,14 @@ func (ie *InfixExpression) String() string {
 	return out.String()
 }
 
+func (this *InfixExpression) Tag() string {
+	return fmt.Sprintf("[%s]%d", INFIXEXPRESSION, this.Id)
+}
+
 type Boolean struct {
 	Token token.Token
 	Value bool
+	Id int64
 }
 
 func (b *Boolean) expressionNode() {
@@ -220,11 +290,16 @@ func (b *Boolean) String() string {
 	return b.Token.Literal
 }
 
+func (this *Boolean) Tag() string {
+	return fmt.Sprintf("[%s]%d", BOOLEAN, this.Id)
+}
+
 type IfExpression struct {
 	Token token.Token
 	Condition Expression
 	Consequence *BlockStatement
 	Alternative *BlockStatement
+	Id int64
 }
 
 func (ie *IfExpression) expressionNode() {
@@ -250,9 +325,14 @@ func (ie *IfExpression) String() string {
 	return out.String()
 }
 
+func (this *IfExpression) Tag() string {
+	return fmt.Sprintf("[%s]%d", IFEXPRESSION, this.Id)
+}
+
 type BlockStatement struct {
 	Token token.Token
 	Statements []Statement
+	Id int64
 }
 
 func (bs *BlockStatement) statementNode() {
@@ -273,12 +353,18 @@ func (bs *BlockStatement) String() string {
 	return out.String()
 }
 
+func (this *BlockStatement) Tag() string {
+	return fmt.Sprintf("[%s]%d", BLOCKSTATEMENT, this.Id)
+}
+
 type FunctionLiteral struct {
 	Token token.Token // The 'fn' token
 	Parameters [] *Identifier
 	Body *BlockStatement
 
 	Name string // function name,which mainly used to handle the closure-recursion problem
+
+	Id int64
 }
 
 func (fl *FunctionLiteral) expressionNode() {
@@ -287,6 +373,10 @@ func (fl *FunctionLiteral) expressionNode() {
 
 func (fl *FunctionLiteral) TokenLiteral() string {
 	return fl.Token.Literal
+}
+
+func (this *FunctionLiteral) Tag() string {
+	return fmt.Sprintf("[%s]%d", FUNCTIONLITERAL, this.Id)
 }
 
 func (fl *FunctionLiteral) String() string {
@@ -311,6 +401,7 @@ type CallExpression struct {
 	Token token.Token  // the '(' token
 	Function Expression // Identifier or FunctionLiteral
 	Arguments []Expression
+	Id int64
 }
 
 func (ce *CallExpression) expressionNode()  {
@@ -337,9 +428,14 @@ func (ce *CallExpression) String() string {
 	return out.String()
 }
 
+func (this *CallExpression) Tag() string {
+	return fmt.Sprintf("[%s]%d", CALLEXPRESSION, this.Id)
+}
+
 type StringLiteral struct {
 	Token token.Token
 	Value string
+	Id int64
 }
 
 func (sl *StringLiteral) expressionNode() {
@@ -353,9 +449,14 @@ func (sl *StringLiteral) String() string {
 	return sl.Token.Literal
 }
 
+func (this *StringLiteral) Tag() string {
+	return fmt.Sprintf("[%s]%d", STRINGLITERAL, this.Id)
+}
+
 type ArrayLiteral struct {
 	Token token.Token // the '[' token
 	Elements []Expression
+	Id int64
 }
 
 func (al *ArrayLiteral) expressionNode() {
@@ -382,10 +483,15 @@ func (al *ArrayLiteral) String() string {
 	return out.String()
 }
 
+func (this *ArrayLiteral) Tag() string {
+	return fmt.Sprintf("[%s]%d", ARRAYLITERAL, this.Id)
+}
+
 type IndexExpression struct {
 	Token token.Token // the [ token
 	Left Expression
 	Index Expression
+	Id int64
 }
 
 func (ie *IndexExpression) expressionNode() {
@@ -409,9 +515,14 @@ func (ie *IndexExpression) String() string {
 	return out.String()
 }
 
+func (this *IndexExpression) Tag() string {
+	return fmt.Sprintf("[%s]%d", INDEXEXPRESSION, this.Id)
+}
+
 type HashLiteral struct {
 	Token token.Token
 	Pairs map[Expression]Expression
+	Id int64
 }
 
 func (hl *HashLiteral) expressionNode() {
@@ -438,9 +549,14 @@ func (hl *HashLiteral) String() string {
 	return out.String()
 }
 
+func (this *HashLiteral) Tag() string {
+	return fmt.Sprintf("[%s]%d", HASHLITERAL, this.Id)
+}
+
 type AssignStatement struct {
 	Token token.Token
 	Expressions [] Expression
+	Id int64
 }
 
 func (as *AssignStatement) statementNode()  {
@@ -462,11 +578,16 @@ func (as *AssignStatement) String() string {
 	return out.String()
 }
 
+func (this *AssignStatement) Tag() string {
+	return fmt.Sprintf("[%s]%d", ASSIGNSTATEMENT, this.Id)
+}
+
 type AssignExpression struct {
 	Token token.Token
 	Name Expression
 	Operator string
 	Expression Expression
+	Id int64
 }
 
 func (ae *AssignExpression) expressionNode() {
@@ -488,10 +609,15 @@ func (ae *AssignExpression) String() string {
 	return out.String()
 }
 
+func (this *AssignExpression) Tag() string {
+	return fmt.Sprintf("[%s]%d", ASSIGNEXPRESSION, this.Id)
+}
+
 type WhileStatement struct {
 	Token token.Token
 	Condition Expression
 	Body *BlockStatement
+	Id int64
 }
 
 func (ws *WhileStatement) statementNode() {
@@ -513,4 +639,8 @@ func (ws *WhileStatement) String() string {
 	out.WriteString("\n}")
 
 	return out.String()
+}
+
+func (this *WhileStatement) Tag() string {
+	return fmt.Sprintf("[%s]%d", WHILESTATEMENT, this.Id)
 }

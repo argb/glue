@@ -39,6 +39,13 @@ var precedences = map[token.TokenType]int{
 	token.LBRACKET: INDEX,
 }
 
+var NodeIndex int64 = 0
+
+func getNodeIndex() int64 {
+	NodeIndex++
+	return NodeIndex
+}
+
 type ParseError struct {
 	Token *token.Token
 	LineNum int
@@ -146,7 +153,7 @@ func New(l *lexer.Lexer) *Parser {
 }
 
 func (p *Parser) parseWhileStatement() *ast.WhileStatement {
-	stmt := &ast.WhileStatement{Token: p.curToken}
+	stmt := &ast.WhileStatement{Token: p.curToken, Id: getNodeIndex()}
 	if p.expectPeek(token.LPAREN) {
 		p.nextToken()
 		stmt.Condition = p.parseExpression(LOWEST)
@@ -166,7 +173,7 @@ func (p *Parser) parseWhileStatement() *ast.WhileStatement {
 }
 
 func (p* Parser) parseAssignExpression(left ast.Expression) ast.Expression {
-	assign := &ast.AssignExpression{Token:p.curToken, Name: left, Operator: p.curToken.Literal}
+	assign := &ast.AssignExpression{Token:p.curToken, Name: left, Operator: p.curToken.Literal, Id: getNodeIndex()}
 
 	p.nextToken()
 	assign.Expression = p.parseExpression(LOWEST)
@@ -175,7 +182,7 @@ func (p* Parser) parseAssignExpression(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseHashLiteral() ast.Expression {
-	hash := &ast.HashLiteral{Token: p.curToken}
+	hash := &ast.HashLiteral{Token: p.curToken, Id: getNodeIndex()}
 	hash.Pairs = make(map[ast.Expression]ast.Expression)
 	for !p.peekTokenIs(token.RBRACE) {
 		p.nextToken()
@@ -197,7 +204,7 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 }
 
 func (p *Parser) parseHashLiteral2() ast.Expression {
-	hash := &ast.HashLiteral{Token: p.curToken}
+	hash := &ast.HashLiteral{Token: p.curToken, Id: getNodeIndex()}
 	hash.Pairs = make(map[ast.Expression]ast.Expression)
 
 	if p.peekTokenIs(token.RBRACE) {
@@ -227,7 +234,7 @@ func (p *Parser) parseHashLiteral2() ast.Expression {
 }
 
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
-	exp := &ast.IndexExpression{Token: p.curToken, Left: left}
+	exp := &ast.IndexExpression{Token: p.curToken, Left: left, Id: getNodeIndex()}
 
 	p.nextToken()
 	exp.Index = p.parseExpression(LOWEST)
@@ -238,7 +245,7 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseArrayLiteral() ast.Expression {
-	array := &ast.ArrayLiteral{Token: p.curToken}
+	array := &ast.ArrayLiteral{Token: p.curToken, Id: getNodeIndex()}
 
 	array.Elements = p.parseExpressionList(token.RBRACKET)
 
@@ -345,7 +352,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 Parser执行语法解析的入口方法
  */
 func (p *Parser) ParseProgram() *ast.Program {
-	program := &ast.Program{}
+	program := &ast.Program{Id: getNodeIndex()}
 	program.Statements = [] ast.Statement{}
 
 	for !p.curTokenIs(token.EOF) {
@@ -386,7 +393,7 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseAssignStatement() *ast.AssignStatement {
-	stmt := &ast.AssignStatement{Token: p.curToken}
+	stmt := &ast.AssignStatement{Token: p.curToken, Id: getNodeIndex()}
 	/*
 	left := p.parseIdentifier()
 	as := p.parseAssignExpression(left)
@@ -405,7 +412,7 @@ func (p *Parser) parseAssignStatement() *ast.AssignStatement {
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
-	stmt := &ast.ExpressionStatement{Token: p.curToken}
+	stmt := &ast.ExpressionStatement{Token: p.curToken, Id: getNodeIndex()}
 
 	stmt.Expression = p.parseExpression(LOWEST)
 
@@ -468,7 +475,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
-	expression := &ast.PrefixExpression{Token: p.curToken, Operator: p.curToken.Literal}
+	expression := &ast.PrefixExpression{Token: p.curToken, Operator: p.curToken.Literal, Id: getNodeIndex()}
 	p.nextToken()
 	expression.Right = p.parseExpression(PREFIX)
 
@@ -480,6 +487,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 		Token: p.curToken,
 		Operator: p.curToken.Literal,
 		Left: left,
+		Id: getNodeIndex(),
 	}
 	precedence := p.curPrecedence()
 	p.nextToken()
@@ -489,11 +497,11 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
-	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal, Id: getNodeIndex()}
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
-	lit := &ast.IntegerLiteral{Token: p.curToken}
+	lit := &ast.IntegerLiteral{Token: p.curToken, Id: getNodeIndex()}
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 	if err != nil {
@@ -508,7 +516,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
-	stmt := &ast.ReturnStatement{Token: p.curToken}
+	stmt := &ast.ReturnStatement{Token: p.curToken, Id: getNodeIndex()}
 
 	p.nextToken()
 
@@ -521,14 +529,14 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
-	stmt := &ast.LetStatement{Token: p.curToken}
+	stmt := &ast.LetStatement{Token: p.curToken, Id: getNodeIndex()}
 
 	if !p.expectPeek(token.IDENT) {
 
 		return nil
 	}
 
-	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal, Id: getNodeIndex()}
 
 	if !p.peekTokenIs(token.ASSIGN) {
 		if p.peekTokenIs(token.SEMICOLON) { // 此处看做是声明 let a;用户没有赋值。
@@ -577,7 +585,7 @@ func (p *Parser) curPrecedence() int {
 }
 
 func (p *Parser) parseBoolean() ast.Expression {
-	return &ast.Boolean{Token: p.curToken, Value: p.curTokenIs(token.TRUE)}
+	return &ast.Boolean{Token: p.curToken, Value: p.curTokenIs(token.TRUE), Id: getNodeIndex()}
 }
 
 func (p *Parser) parseGroupedExpression() ast.Expression {
@@ -593,7 +601,7 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 }
 
 func (p *Parser) parseIfExpression() ast.Expression {
-	expression := &ast.IfExpression{Token: p.curToken}
+	expression := &ast.IfExpression{Token: p.curToken, Id: getNodeIndex()}
 
 	if !p.expectPeek(token.LPAREN) {
 		return nil
@@ -621,7 +629,7 @@ func (p *Parser) parseIfExpression() ast.Expression {
 }
 
 func (p *Parser) parseBlockStatement() *ast.BlockStatement {
-	block := &ast.BlockStatement{Token: p.curToken}
+	block := &ast.BlockStatement{Token: p.curToken, Id: getNodeIndex()}
 	block.Statements = []ast.Statement{}
 	p.nextToken()
 	for !p.curTokenIs(token.RBRACE) {
@@ -636,7 +644,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 }
 
 func (p *Parser) parseFunctionLiteral() ast.Expression {
-	lit :=&ast.FunctionLiteral{Token: p.curToken} // The 'fn' token
+	lit :=&ast.FunctionLiteral{Token: p.curToken, Id: getNodeIndex()} // The 'fn' token
 
 	if !p.expectPeek(token.LPAREN) {
 		return nil
@@ -673,6 +681,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 		ident := &ast.Identifier{
 			Token: p.curToken,
 			Value: p.curToken.Literal,
+			Id: getNodeIndex(),
 		}
 		identifiers = append(identifiers, ident)
 	}
@@ -686,7 +695,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 }
 
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
-	exp := &ast.CallExpression{Token: p.curToken, Function: function}
+	exp := &ast.CallExpression{Token: p.curToken, Function: function, Id: getNodeIndex()}
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
 
 	return exp
@@ -719,5 +728,5 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 }
 
 func (p *Parser) parseStringLiteral() ast.Expression {
-	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
+	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal, Id: getNodeIndex()}
 }

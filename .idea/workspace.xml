@@ -7,7 +7,11 @@
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ast.dot" beforeDir="false" afterPath="$PROJECT_DIR$/ast.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ast.png" beforeDir="false" afterPath="$PROJECT_DIR$/ast.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ast/ast.go" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ast.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tools/gendot.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/gendot.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trivial/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/trivial/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +55,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
-    <property name="settings.editor.selected.configurable" value="proofread" />
+    <property name="settings.editor.selected.configurable" value="StringManipulation" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -75,6 +79,15 @@
       <package value="glue/tools" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/tools/gendot.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build glue/trivial" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="glue" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="glue/trivial" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/trivial/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="TestFunctionLiteralWithName in glue/parser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -101,25 +114,13 @@
       <pattern value="^\QTestRecursiveFunctions\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestShadowingFunctionName in glue/compiler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="glue" />
-      <working_directory value="$PROJECT_DIR$/compiler" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="glue/compiler" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestShadowingFunctionName\E$" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build glue/tools" />
-        <item itemvalue="Go Build.go build glue" />
+        <item itemvalue="Go Build.go build glue/trivial" />
         <item itemvalue="Go Test.TestRecursiveFunctions in glue/compiler" />
         <item itemvalue="Go Test.TestFunctionLiteralWithName in glue/parser" />
-        <item itemvalue="Go Test.TestShadowingFunctionName in glue/compiler" />
+        <item itemvalue="Go Build.go build glue" />
       </list>
     </recent_temporary>
   </component>
@@ -144,5 +145,16 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/tools/gendot.go</url>
+          <line>166</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
