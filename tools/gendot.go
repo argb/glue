@@ -16,7 +16,13 @@ var Index int64 = 0
 func main() {
 	input :=`
 let a=10;
-let d=a+b+c*6/9
+let d=a+b+c*6/9;
+if(a>b){
+	let x=10;
+}
+let add=fn(a, b){
+return a+b;
+}
 `
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -126,19 +132,42 @@ func genLeaf(obj interface{}) string {
 func walk(node ast.Node, lines *[]string) {
 	switch node := node.(type) {
 	case *ast.Program:
-
-		//nodeId := "program["+fmt.Sprintf("%d", node.Id)+"];"
 		//*lines = append(*lines, genNode(node))
 		for _, statement := range node.Statements{
 			*lines = append(*lines, genEdgeToNode(node, statement))
 			walk(statement,lines)
 		}
+	case *ast.BlockStatement:
+		for _, statement := range node.Statements {
+			*lines = append(*lines, genEdgeToNode(node, statement))
+			walk(statement, lines)
+		}
+
+	case *ast.ExpressionStatement:
+		*lines = append(*lines, genEdgeToNode(node, node.Expression))
+		walk(node.Expression, lines)
+	case *ast.ReturnStatement:
+		*lines = append(*lines, genEdgeToLeaf(node, "return"))
+
+		*lines = append(*lines, genEdgeToNode(node, node.ReturnValue))
+		walk(node.ReturnValue, lines)
 	case *ast.IfExpression:
 		//*lines = append(*lines, genNode(node))
 
 		*lines = append(*lines, genEdgeToLeaf(node, "if"))
+
 		*lines = append(*lines, genEdgeToNode(node, node.Condition))
 		walk(node.Condition, lines)
+
+		*lines = append(*lines, genEdgeToNode(node, node.Consequence))
+		walk(node.Consequence, lines)
+
+		if node.Alternative != nil {
+			*lines = append(*lines, genEdgeToLeaf(node, "else"))
+			*lines = append(*lines, genEdgeToNode(node, node.Alternative))
+			walk(node.Alternative, lines)
+		}
+
 
 	case *ast.InfixExpression:
 		//*lines = append(*lines, genNode(node))
@@ -155,11 +184,7 @@ func walk(node ast.Node, lines *[]string) {
 		*lines = append(*lines, genEdgeToLeaf(node, node.Operator))
 		walk(node.Right, lines)
 
-	case *ast.Identifier:
-		//*lines = append(*lines, genNode(node))
-		//*lines = append(*lines, genLeaf(node.Value))
-		*lines = append(*lines, genEdgeToLeaf(node, node.Value))
-		return
+
 	case *ast.LetStatement:
 		//*lines = append(*lines, genNode(node))
 		*lines = append(*lines, genEdgeToLeaf(node, "let"))
@@ -170,6 +195,11 @@ func walk(node ast.Node, lines *[]string) {
 
 		*lines = append(*lines, genEdgeToNode(node, node.Value))
 		walk(node.Value, lines)
+	case *ast.Identifier:
+		//*lines = append(*lines, genNode(node))
+		//*lines = append(*lines, genLeaf(node.Value))
+		*lines = append(*lines, genEdgeToLeaf(node, node.Value))
+		return
 	case *ast.IntegerLiteral:
 		//*lines = append(*lines, genNode(node))
 		//*lines = append(*lines, genLeaf(node.Value))
@@ -180,8 +210,23 @@ func walk(node ast.Node, lines *[]string) {
 		//*lines = append(*lines, genLeaf(node.Value))
 		*lines = append(*lines, genEdgeToLeaf(node, node.Value))
 		return
-	case *ast.BlockStatement:
-		//*lines = append(*lines, genNode(node))
+	case *ast.FunctionLiteral:
+		*lines = append(*lines, genEdgeToLeaf(node, "fn"))
+
+		*lines = append(*lines, genEdgeToLeaf(node, "("))
+
+		if node.Parameters != nil && len(node.Parameters)>0{
+			for _, parameter := range node.Parameters {
+				*lines = append(*lines, genEdgeToNode(node, parameter))
+				walk(parameter, lines)
+			}
+		}
+		*lines = append(*lines, genEdgeToLeaf(node, ")"))
+		*lines = append(*lines, genEdgeToLeaf(node, "{"))
+
+		*lines = append(*lines, genEdgeToNode(node, node.Body))
+		walk(node.Body, lines)
+		*lines = append(*lines, genEdgeToLeaf(node, "}"))
 
 	}
 }
