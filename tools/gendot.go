@@ -16,8 +16,8 @@ var Index int64 = 0
 func main() {
 	input :=`
 let a=10;
-let d=a+b+c*6/9;
-if(a>b){
+let d=-a+(b+c)*6*-1+add(a,10)/9;
+if(!(a>b)){
 	let x=10;
 }else{
  let x= 100;
@@ -193,6 +193,7 @@ func walk(node ast.Node, lines *[]string) {
 		walk(node.Right, lines)
 	case *ast.PrefixExpression:
 		*lines = append(*lines, genEdgeToLeaf(node, node.Operator))
+		*lines = append(*lines, genEdgeToNode(node, node.Right))
 		walk(node.Right, lines)
 	case *ast.CallExpression:
 		*lines = append(*lines, genEdgeToNode(node, node.Function))
