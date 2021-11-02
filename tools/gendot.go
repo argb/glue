@@ -19,10 +19,13 @@ let a=10;
 let d=a+b+c*6/9;
 if(a>b){
 	let x=10;
+}else{
+ let x= 100;
 }
 let add=fn(a, b){
 return a+b;
 }
+add(3,4)
 `
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -146,6 +149,17 @@ func walk(node ast.Node, lines *[]string) {
 	case *ast.ExpressionStatement:
 		*lines = append(*lines, genEdgeToNode(node, node.Expression))
 		walk(node.Expression, lines)
+
+	case *ast.LetStatement:
+		//*lines = append(*lines, genNode(node))
+		*lines = append(*lines, genEdgeToLeaf(node, "let"))
+		*lines = append(*lines, genEdgeToNode(node, node.Name))
+		walk(node.Name, lines)
+
+		*lines = append(*lines, genEdgeToLeaf(node, "="))
+
+		*lines = append(*lines, genEdgeToNode(node, node.Value))
+		walk(node.Value, lines)
 	case *ast.ReturnStatement:
 		*lines = append(*lines, genEdgeToLeaf(node, "return"))
 
@@ -168,11 +182,8 @@ func walk(node ast.Node, lines *[]string) {
 			walk(node.Alternative, lines)
 		}
 
-
 	case *ast.InfixExpression:
 		//*lines = append(*lines, genNode(node))
-
-
 		*lines = append(*lines, genEdgeToNode(node, node.Left))
 		walk(node.Left, lines)
 
@@ -183,18 +194,19 @@ func walk(node ast.Node, lines *[]string) {
 	case *ast.PrefixExpression:
 		*lines = append(*lines, genEdgeToLeaf(node, node.Operator))
 		walk(node.Right, lines)
+	case *ast.CallExpression:
+		*lines = append(*lines, genEdgeToNode(node, node.Function))
+		walk(node.Function, lines)
 
+		if len(node.Arguments) > 0 {
+			*lines = append(*lines, genEdgeToLeaf(node, "("))
+			for _, argument := range node.Arguments {
+				*lines = append(*lines, genEdgeToNode(node, argument))
+				walk(argument, lines)
+			}
+			*lines = append(*lines, genEdgeToLeaf(node, ")"))
+		}
 
-	case *ast.LetStatement:
-		//*lines = append(*lines, genNode(node))
-		*lines = append(*lines, genEdgeToLeaf(node, "let"))
-		*lines = append(*lines, genEdgeToNode(node, node.Name))
-		walk(node.Name, lines)
-
-		*lines = append(*lines, genEdgeToLeaf(node, "="))
-
-		*lines = append(*lines, genEdgeToNode(node, node.Value))
-		walk(node.Value, lines)
 	case *ast.Identifier:
 		//*lines = append(*lines, genNode(node))
 		//*lines = append(*lines, genLeaf(node.Value))
