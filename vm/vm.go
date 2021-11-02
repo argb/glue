@@ -72,7 +72,7 @@ type RuntimeError struct {
 }
 
 func (re *RuntimeError) Error() string {
-	re.msg = fmt.Sprintf("invalid operation. opcode:%q", re.opcode)
+	// re.msg = fmt.Sprintf("invalid operation. opcode:%q", re.opcode)
 
 	return re.msg
 }
@@ -123,6 +123,11 @@ func (vm *VM) currentFrame() *Frame {
 func (vm *VM) pushFrame(f *Frame) {
 	vm.frames[vm.frameIndex] = f
 	vm.frameIndex++
+	if vm.frameIndex >= MaxFrames {
+		err := new(RuntimeError)
+		err.msg = fmt.Sprintf("stack overflow, max stack size %d, 你妈喊你回家吃饭！", MaxFrames)
+		panic(err)
+	}
 }
 
 func (vm *VM) popFrame() *Frame {

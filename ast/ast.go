@@ -654,10 +654,7 @@ func (this *WhileStatement) Tag() string {
 }
 
 type FunctionDefinitionStatement struct {
-	Name *Identifier
 	Token token.Token
-	Parameters [] *Identifier
-	Body *BlockStatement
 	Id int64
 	FnLiteral *FunctionLiteral
 }

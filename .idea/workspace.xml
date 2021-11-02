@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast.dot" beforeDir="false" afterPath="$PROJECT_DIR$/ast.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast.png" beforeDir="false" afterPath="$PROJECT_DIR$/ast.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ast/ast.go" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ast.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compiler/compiler.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/compiler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grammars/grammars.txt" beforeDir="false" afterPath="$PROJECT_DIR$/grammars/grammars.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser/parser_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/token/token.go" beforeDir="false" afterPath="$PROJECT_DIR$/token/token.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/gendot.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/gendot.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/log/glue.log" beforeDir="false" afterPath="$PROJECT_DIR$/data/log/glue.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/t3.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t3.gl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/glue" beforeDir="false" afterPath="$PROJECT_DIR$/glue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vm/vm.go" beforeDir="false" afterPath="$PROJECT_DIR$/vm/vm.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +61,16 @@
       <recent name="$PROJECT_DIR$/tools/log" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build glue/tools">
+  <component name="RunManager" selected="Go Build.go build glue">
+    <configuration name="go build glue" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="glue" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="glue" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build glue/tools" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$" />
@@ -96,18 +101,6 @@
       <pattern value="^\QTestFunctionLiteralParsing\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestFunctionLiteralWithName in glue/parser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="glue" />
-      <working_directory value="$PROJECT_DIR$/parser" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="glue/parser" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestFunctionLiteralWithName\E$" />
-      <method v="2" />
-    </configuration>
     <configuration name="TestRecursiveFunctions in glue/compiler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$/compiler" />
@@ -122,11 +115,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build glue" />
         <item itemvalue="Go Build.go build glue/tools" />
         <item itemvalue="Go Test.TestFunctionLiteralParsing in glue/parser" />
         <item itemvalue="Go Build.go build glue/trivial" />
         <item itemvalue="Go Test.TestRecursiveFunctions in glue/compiler" />
-        <item itemvalue="Go Test.TestFunctionLiteralWithName in glue/parser" />
       </list>
     </recent_temporary>
   </component>

@@ -131,6 +131,23 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 		c.emit(code.OpPop)
+	case *ast.FunctionDefinitionStatement:
+		// 生成符号，加入到当前作用域对应的符号表，当前作用域是在编译函数字面量的时候确定的，在此处处理 case *ast.FunctionLiteral:
+		symbol := c.symbolTable.Define(node.FnLiteral.Name.Value)
+		err := c.Compile(node.FnLiteral)
+		if err != nil {
+			return err
+		}
+
+		//编译器只需要确定当前处理的符号是个本地变量还是全局变量，而不需要关心嵌套了几层
+		// 只要是局部变量就生成局部指令OpSetLocal, 而到底要从哪一层作用域取出绑定的数据有VM在运行时完成
+		// 其实VM也不需要去特殊判断，只要按正常的指令运算流程处理就可以了，因为整个栈机制和生成的每个指令执行方式就已经可以确保
+		// 从正确的作用域中取出数据
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		}else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
 	case *ast.PrefixExpression:
 		err := c.Compile(node.Right)
 		if err != nil {

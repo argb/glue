@@ -1,7 +1,8 @@
-let f1=fn(){
-    return 10;
+fn f1(){
+
     let x=1;
-    print(x);
+
+    f1()
 }
 
 f1();
