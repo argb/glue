@@ -1,7 +1,11 @@
-fn f1(){
-    let x=99;
-    x=300
-    return x;
+fn getAdder(seed){
+    let add = fn(n){
+        return seed+n
+    }
+    return add;
 }
 
-f1();
+let add = getAdder(10);
+let n = add(10)
+
+print(n)

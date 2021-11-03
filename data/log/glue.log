@@ -127,3 +127,6 @@
 [INFO]2021/11/04 01:00:40 log_helper.go:54: source file: ./examples/t3.gl
 [INFO]2021/11/04 01:01:10 log_helper.go:54: source file: ./examples/t3.gl
 [INFO]2021/11/04 01:01:28 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/04 03:00:54 log_helper.go:54: source file: ./examples/t3.gl
+[ERROR]2021/11/04 03:09:50 log_helper.go:68: load src file  failed, error:read /Users/ender/work/go/glue: is a directory
+[ERROR]2021/11/04 03:10:54 log_helper.go:68: load src file  failed, error:read /Users/ender/work/go/glue: is a directory

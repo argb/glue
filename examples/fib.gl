@@ -11,6 +11,7 @@ let f1=fn(){
             }
         }
     };
-    fibonacci(5);
+    return fibonacci(15);
 }
-f1();
+
+print(f1());

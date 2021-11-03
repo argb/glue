@@ -1,14 +1,11 @@
-let a=10;
-let b=11;
-let c=12;
-let x=fn(x1,x2){
-    let m=100;
-    let n=200;
-    return m+n;
+fn getAdder(seed){
+    let add = fn(n){
+        return seed+n
+    }
+    return add;
 }
-let i=1;
-let j=2;
-x(i,j);
-let k=888
-k;
 
+let add = getAdder(10);
+let n = add(10)
+
+print(n)

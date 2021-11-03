@@ -15,4 +15,6 @@ let double = fn(x) {
     return x * 2;
 };
 
-map(a, double);
+let m = map(a, double);
+
+print(m)

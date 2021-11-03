@@ -52,8 +52,8 @@ func main() {
 	if *input == "" {
 		if len(args) == 0 {
 			fmt.Println("请指定源文件，示例：")
-			fmt.Println("./glue helloworld.gl")
-			//return
+			fmt.Println("./glue ./examples/t2.gl")
+			return
 		}else {
 			iptFile = args[0]
 		}
@@ -61,9 +61,9 @@ func main() {
 	}else {
 		iptFile = *input
 	}
-	iptFile = "./examples/t3.gl"
+	//iptFile = "./examples/t3.gl"
 	fmt.Println(iptFile)
-	log.Infof("source file: %s", iptFile)
+	//log.Infof("source file: %s", iptFile)
 
 	//fmt.Printf("input and args0: %#v, %#v\n", *input, args[0])
 
@@ -82,7 +82,7 @@ func main() {
 			log.ErrorF("error %s", err)
 			panic(err)
 		}
-		c.Info()
+		//c.Info()
 		//fmt.Println("instructions:", c.Bytecode().Instructions.String())
 		machine := vm.New(c.Bytecode())
 
@@ -91,12 +91,12 @@ func main() {
 			log.ErrorF("error %s", err)
 			panic(err)
 		}
-		result := machine.LastPoppedStackElem()
+		//result := machine.LastPoppedStackElem()
 		//io.WriteString(os.Stdout, lastPopped.Inspect())
 		//io.WriteString(os.Stdout, "\n")
 		fmt.Println("engine: vm")
-		fmt.Println(result.Inspect())
-		machine.ShowReadableConstants()
+		//fmt.Println(result.Inspect())
+		//machine.ShowReadableConstants()
 		//mn := monitor.SingletonNew()
 		//fmt.Println("Instruction sequence:")
 		//mn.ShowInstructions()
