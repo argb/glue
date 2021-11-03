@@ -30,7 +30,7 @@ func main() {
 
 	//terminal.Set(terminal.FG_GREEN)
 	color.Set(color.FgMagenta)
-	fmt.Printf("你好 %s! 吃了吗？\n", currUser.Username)
+	fmt.Printf("你好 %s!\n", currUser.Username)
 	//terminal.Unset()
 	fmt.Printf("Welcome to use GLUE！\n")
 	color.Unset()
@@ -40,7 +40,7 @@ func main() {
 	input := flag.String("src", "", "the input(source) file name")
 	//output := flag.String("src", "", "the output file name")
 	flag.Parse()
-	fmt.Println(*interactive)
+	//fmt.Println(*interactive)
 	if *interactive == true {
 		//terminal.TT()
 		repl.Start(os.Stdin, os.Stdout)

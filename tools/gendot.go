@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/md5"
+	"flag"
 	"fmt"
 	"glue/ast"
 	"glue/lexer"
@@ -14,7 +15,7 @@ import (
 var Index int64 = 0
 
 func main() {
-
+/*
 	input :=`
 fn sub(x,y){
 	let z=x-y
@@ -35,15 +36,30 @@ return a+b;
 }
 add(3,4)
 `
+	*/
+	//iptFile := flag.String("src", "", "the input(source) file name")
 
+
+	flag.Parse()
+	args := flag.Args()
+	fmt.Println(args)
+	if len(args) <= 0 {
+		fmt.Println("请指定源文件")
+		return
+	}
+
+	iptFile := args[0]
+	//output := flag.String("src", "", "the output file name")
+	//flag.Parse()
 	//input := `add(3,4)`
-	l := lexer.New(input)
+	//l := lexer.New(input)
+	l := lexer.NewFromFile(iptFile)
 	p := parser.New(l)
 
 	program := p.ParseProgram()
 	var lines []string
 
-	fmt.Println("the whole program:\n", program.String())
+	//fmt.Println("the whole program:\n", program.String())
 
 	var dotSrc bytes.Buffer
 	dotSrc.WriteString("digraph ast {\n")
@@ -72,6 +88,7 @@ func genFile(src string) {
 	writer.WriteString(src)
 
 	writer.Flush()
+	fmt.Println("Got file ast.dot, open it with [dot -Tpng ast.dot -o ast.png]")
 }
 
 func md5v1(str string) string {
