@@ -120,10 +120,7 @@ func Make(op Opcode, operands ...int) []byte {
 
 // ReadOperands /**
 /*
-这个参数ins可能需要调整，ins不应该是instructions，应该是oprands，现在是从指令序列里读取操作数，参数传进来要给出正确
-的指令的偏移位置，否则就出错，所以语义上有点乱，读取操作数就应该单纯的读取，不要考虑偏移，控制偏移就是专门的控制偏移，有单独的函数起个合适的
-函数名字来完成，图省事，暂时先这样
-Todo: 后续要调整
+根据定义读取一条指令的操作数
  */
 func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 	operands := make([]int, len(def.OperandWidths))
