@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ast/ast.go" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ast.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/log/glue.log" beforeDir="false" afterPath="$PROJECT_DIR$/data/log/glue.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/evaluator/evaluator.go" beforeDir="false" afterPath="$PROJECT_DIR$/evaluator/evaluator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grammars/grammars.txt" beforeDir="false" afterPath="$PROJECT_DIR$/grammars/grammars.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluator/evaluator_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/evaluator/evaluator_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +61,7 @@
       <recent name="$PROJECT_DIR$/tools/log" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build glue">
+  <component name="RunManager" selected="Go Test.TestFunctionDefineStatement in glue/evaluator">
     <configuration name="go build glue" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="glue" />
       <working_directory value="$PROJECT_DIR$" />
@@ -83,46 +80,49 @@
       <filePath value="$PROJECT_DIR$/tools/gendot.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build glue/trivial" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+    <configuration name="TestAssignStatements in glue/evaluator" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="glue" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="glue/trivial" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/trivial/main.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestFunctionLiteralParsing in glue/parser" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="glue" />
-      <working_directory value="$PROJECT_DIR$/parser" />
+      <working_directory value="$PROJECT_DIR$/evaluator" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="glue/parser" />
+      <package value="glue/evaluator" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestFunctionLiteralParsing\E$" />
+      <pattern value="^\QTestAssignStatements\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRecursiveFunctions in glue/compiler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestFunctionDefineStatement in glue/evaluator" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="glue" />
-      <working_directory value="$PROJECT_DIR$/compiler" />
+      <working_directory value="$PROJECT_DIR$/evaluator" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="glue/compiler" />
+      <package value="glue/evaluator" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestRecursiveFunctions\E$" />
+      <pattern value="^\QTestFunctionDefineStatement\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestFunctionObject in glue/evaluator" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="glue" />
+      <working_directory value="$PROJECT_DIR$/evaluator" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="glue/evaluator" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestFunctionObject\E$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestFunctionDefineStatement in glue/evaluator" />
+        <item itemvalue="Go Test.TestFunctionObject in glue/evaluator" />
+        <item itemvalue="Go Test.TestAssignStatements in glue/evaluator" />
         <item itemvalue="Go Build.go build glue" />
         <item itemvalue="Go Build.go build glue/tools" />
-        <item itemvalue="Go Test.TestFunctionLiteralParsing in glue/parser" />
-        <item itemvalue="Go Build.go build glue/trivial" />
-        <item itemvalue="Go Test.TestRecursiveFunctions in glue/compiler" />
       </list>
     </recent_temporary>
   </component>

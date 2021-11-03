@@ -42,18 +42,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalInfixExpression(node.Operator, left, right)
-		/*
-	case *ast.AssignExpression:
-		val := Eval(node.Expression, env)
-		if isError(val) {
-			return val
-		}
-		if val==nil || reflect.ValueOf(val).IsNil() {
-			val = &object.Null{}
-		}
-
-		env.Set(node.Name.String(), val)
-		 */
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
 	case *ast.IfExpression:
@@ -69,6 +57,18 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			val = &object.Null{}
 		}
 		env.Set(node.Name.Value, val)
+	case *ast.AssignStatement:
+		val := Eval(node.Rhs, env)
+		if isError(val) {
+			return val
+		}
+		if val==nil || reflect.ValueOf(val).IsNil() {
+			val = &object.Null{}
+		}
+
+		env.Set(node.Lhs.Value, val)
+	case *ast.FunctionDefinitionStatement:
+		evalFuncDefStatement(node, env)
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
 	case *ast.FunctionLiteral:
@@ -115,6 +115,15 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	}
 	return nil
 	//return newError("No valid ast node to evaluate")
+}
+
+func evalFuncDefStatement(node *ast.FunctionDefinitionStatement, env *object.Environment) {
+	params := node.FnLiteral.Parameters
+	body := node.FnLiteral.Body
+
+	fnObj := &object.Function{Parameters: params, Env: env, Body: body}
+
+	env.Set(node.FnLiteral.Name.Value, fnObj)
 }
 
 func evalWhileStatement(node *ast.WhileStatement, env *object.Environment) object.Object {
@@ -300,11 +309,6 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	return result
 }
 
-/*
-这个处理貌似也有点不合适，还是重复解析的问题，如果没嵌套语句没问题，
-如果有嵌套语句就会出现重复解析。根本问题还是在于，所有的节点没有长在一棵树上，如果不在ast，就不应该被evaluate取值。
-算是个补丁，后面要改一下
- */
 func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var result object.Object
 
@@ -369,34 +373,6 @@ func nativeBoolToBooleanObject(input bool) *object.Boolean {
 		return TRUE
 	}
 	return FALSE
-}
-
-/*
-这个写法好像有点问题，因为这里存储了整个代码文件的全部语句，是并列关系
-比如:
-A ::= statement|statement_list
-statement_list ::=b|c|d
-假如a = {b,c,d}
-那么这个statements数组就是[a,b,c,d],因为b,c,d是从a里面解析出来的，
-语法上来说也是句子，就塞到这个顶层数组了，但是b,c,d已经存在于基于a所构造的ast上了
-也就是这个statements数组里的b,c,d应该只能看做是一种快捷方式，而不能作为ast的一部分
-进行解析，否则就会重复解析，可能会导致解析逻辑混乱和错误
-暂时先这么着吧，打补丁弥补逻辑问题，现在能正常跑起来，但是逻辑上不合理，后续优化吧
-[todo]
- */
-func evalStatements(stmts []ast.Statement, env *object.Environment) object.Object {
-	var result object.Object
-	for _, statement := range stmts {
-		/*
-		if i>=1 {return result}
-		fmt.Println(i,statement.String())
-		 */
-		result = Eval(statement, env)
-		if returnValue, ok := result.(*object.ReturnValue); ok {
-			return returnValue.Value
-		}
-	}
-	return result
 }
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {

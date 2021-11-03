@@ -32,7 +32,7 @@ func main() {
 	color.Set(color.FgMagenta)
 	fmt.Printf("你好 %s! 吃了吗？\n", currUser.Username)
 	//terminal.Unset()
-	fmt.Printf("欢迎使用【Go艹】语言！\n")
+	fmt.Printf("Welcome to use GLUE！\n")
 	color.Unset()
 
 	interactive := flag.Bool("i", false, "start REPL")
