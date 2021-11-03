@@ -589,7 +589,7 @@ func (as *AssignStatement) String() string {
 func (this *AssignStatement) Tag() string {
 	return fmt.Sprintf("[%s]%d", ASSIGNSTATEMENT, this.Id)
 }
-
+/*
 type AssignExpression struct {
 	Token token.Token
 	Name Expression
@@ -620,6 +620,7 @@ func (ae *AssignExpression) String() string {
 func (this *AssignExpression) Tag() string {
 	return fmt.Sprintf("[%s]%d", ASSIGNEXPRESSION, this.Id)
 }
+ */
 
 type WhileStatement struct {
 	Token token.Token

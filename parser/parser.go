@@ -123,10 +123,11 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.prefixParserFns = make(map[token.TokenType]prefixParserFn)
 
-	p.registerPrefix(token.IDENT, p.parseIdentifier)
-	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+	/*
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
@@ -135,7 +136,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral2)
-
+*/
 	p.infixParseFns	  = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
@@ -171,7 +172,7 @@ func (p *Parser) parseWhileStatement() *ast.WhileStatement {
 	stmt.Body = p.parseBlockStatement()
 	return stmt
 }
-
+/*
 func (p* Parser) parseAssignExpression(left ast.Expression) ast.Expression {
 	assign := &ast.AssignExpression{Token:p.curToken, Name: left, Operator: p.curToken.Literal, Id: getNodeIndex()}
 
@@ -180,7 +181,7 @@ func (p* Parser) parseAssignExpression(left ast.Expression) ast.Expression {
 
 	return assign
 }
-
+*/
 func (p *Parser) parseHashLiteral() ast.Expression {
 	hash := &ast.HashLiteral{Token: p.curToken, Id: getNodeIndex()}
 	hash.Pairs = make(map[ast.Expression]ast.Expression)
@@ -435,42 +436,56 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
-func (p *Parser) noPrefixParseFnError(t token.TokenType) {
-	msg := fmt.Sprintf("no prefix parse function for %q found.", t)
-	//fmt.Printf("token:%#v, token-literal:%s\n", t, p.curToken.Literal)
-	//fmt.Println(msg)
-	pErr := new(ParseError)
+func (p *Parser) parseEpsilonExpression() ast.Expression {
+	switch p.curToken.Type {
+	case token.IDENT:
+		return p.parseIdentifier()
+	case token.INT:
+		return p.parseIntegerLiteral()
+	case token.TRUE:
+		return p.parseBoolean()
+	case token.FALSE:
+		return p.parseBoolean()
+	case token.LPAREN:
+		return p.parseGroupedExpression()
+	case token.FUNCTION:
+		return p.parseFunctionLiteral()
+	case token.STRING:
+		return p.parseStringLiteral()
+	case token.LBRACKET:
+		return p.parseArrayLiteral()
+	case token.LBRACE:
+		return p.parseHashLiteral2()
+	case token.IF:
+		return p.parseIfExpression()
+	default:
+		p.parseEpsilonExpressionError(p.curToken)
+		return nil
+	}
+}
 
+func (p *Parser) parseEpsilonExpressionError(t token.Token) {
+	msg := fmt.Sprintf("unexpected token %s[%s] for espilon expression.", t.Literal, t.Type)
+
+	pErr := new(ParseError)
 	pErr.Token = &p.curToken
 	pErr.LineNum = p.l.CurrLineNum
 	pErr.ColNum = p.l.CurrColNum
-
 	pErr.msg = msg
 
 	p.errors = append(p.errors, pErr.String())
-}
-
-func (p *Parser) parseE() ast.Expression {
-	var leftEpsilon ast.Expression //
-	initOp := "epsilon"
-	precedence := LOWEST
-	exp := &ast.InfixExpression{Left: leftEpsilon, Operator: initOp}
-	right := p.parseExpression(precedence)
-	exp.Right = right
-
-	return exp
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	//fmt.Printf("token: %#v \n", p.curToken)
 	prefix := p.prefixParserFns[p.curToken.Type]
 
-	if prefix == nil {
-		p.noPrefixParseFnError(p.curToken.Type)
-		return nil
+	var leftExp ast.Expression
+	if prefix != nil {
+		leftExp = prefix()
+	}else {
+		leftExp = p.parseEpsilonExpression()
 	}
-
-	leftExp := prefix()
 
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
 		infix := p.infixParseFns[p.peekToken.Type]

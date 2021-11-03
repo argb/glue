@@ -2,6 +2,8 @@
 表达式的解析因为采用了递归下降的算符优先算法，所以表达式相关的产生式规则被大大简化了，
 经典语法书中经常看到的term/factor等描述表达式的规则这里并不需要，不是我漏写了。
 
+下文中如果出现<epsilon>并不表示一个非终结符， 用以表示终结符 ε, 因为 ε 这个希腊字母打起来费劲。
+
 以下主要的产生式语法规则
 ========================================================
 程序：
@@ -18,8 +20,9 @@
 返回语句：
 <return statement> ::= return <expression>
 条件判断语句(if 语句):
-<if statement> ::= if (<expression>) <consequence> else <alternative>
+<if statement> ::= if (<expression>) <consequence> <if statement tail>
 <consequence> ::= <block statement>
+<if statement tail> ::= else <alternative> | ε
 <alternative> ::= <block statement>
 表达式语句：
 <expression statement> ::= <expression>;
@@ -36,14 +39,23 @@ while 循环语句：
 <parameter list tail> ::= , <parameter list>
 
 表达式：
-<expression> ::=  <prefix expression> | <prefix expression> <infix expression>
+<expression> ::=  <prefix expression> | <epsilon expression> | <prefix expression> <infix expression>
+                   | <epsilon expression> <<infix expression>
+空前缀表达式：
+可以看作一种特殊的前缀表达式，这种表达式的前缀运算符为空(用ε表示），在逻辑上这意味着"这个运算符只是一个逻辑占位，不做任何解析"，直接进行后续
+产生式的解析，引入这层结构主要是为了更清晰、一致的描述<expression>的产生式结构。
+这样就可以构建一个非常一致的表达式逻辑结构：<表达式> => <运算符><运算数>
+<epsilon expression> ::= <identifier> | <integer literal> | <string literal> | ...
 前缀表达式：
-<prefix expression> ::= <prefix operator><expression>|<identifier> | <integer literal> | <string literal> | ...
+<prefix expression> ::= <prefix operator><expression>
 中缀表达式
+虽然名字是"中缀"表达式，但在解析的时候是不断从当前中缀运算符位置向后解析的，只有本次解析终止的时候才会跟左侧运算数结合，
+构成[lhs operator rhs]的节点形式。
 <infix expression> ::= <infix operator><expression>
 前缀运算符
 <prefix operator> ::= - | !
 中缀运算符
+这些中缀运算符也可能出现在<epsilon expression>和<prefix expression>中，但是由于出现的上下文的不同，会被不同的解析。
 <infix operator> ::= + | - | * | / | ( | [
 
 标志符：

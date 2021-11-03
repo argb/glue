@@ -1,9 +1,9 @@
 package evaluator
 
 import (
+	"fmt"
 	"glue/ast"
 	"glue/object"
-	"fmt"
 	"reflect"
 )
 
@@ -42,6 +42,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalInfixExpression(node.Operator, left, right)
+		/*
 	case *ast.AssignExpression:
 		val := Eval(node.Expression, env)
 		if isError(val) {
@@ -52,6 +53,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		env.Set(node.Name.String(), val)
+		 */
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
 	case *ast.IfExpression:
