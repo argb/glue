@@ -147,7 +147,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
-	p.registerInfix(token.ASSIGN, p.parseAssignExpression)
+	//p.registerInfix(token.ASSIGN, p.parseAssignExpression)
 
 	return p
 }
@@ -383,8 +383,6 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
-	//case token.IDENT:
-		//return p.parseAssignStatement()
 	case token.WHILE:
 		return p.parseWhileStatement()
 	case token.FUNCTION:
@@ -393,26 +391,35 @@ func (p *Parser) parseStatement() ast.Statement {
 		}
 		return p.parseExpressionStatement()
 	default:
+		if p.peekTokenIs(token.ASSIGN) {
+			return p.parseAssignStatement()
+		}
 		return p.parseExpressionStatement()
 	}
 }
 
 func (p *Parser) parseAssignStatement() *ast.AssignStatement {
 	stmt := &ast.AssignStatement{Token: p.curToken, Id: getNodeIndex()}
-	/*
-	left := p.parseIdentifier()
-	as := p.parseAssignExpression(left)
 
-	if p.peekTokenIs(token.ASSIGN) {
-		p.nextToken()
-		p.nextToken()
-		stmt.Expression = p.parseExpression(LOWEST)
+	lhs := &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+		Id: getNodeIndex(),
 	}
+	stmt.Lhs = lhs
+	//as := p.parseAssignExpression(left)
 
-	if !p.expectPeek(token.SEMICOLON) {
+	if p.expectPeek(token.ASSIGN) {
+		p.nextToken()
+		stmt.Rhs = p.parseExpression(LOWEST)
+	}else {
 		return nil
 	}
-	 */
+
+	if p.peekTokenIs(token.SEMICOLON) { // 这里没有对分号(;)做强制要求，写不写都不算错，直接跳过了。
+		p.nextToken()
+	}
+
 	return stmt
 }
 

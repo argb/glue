@@ -107,3 +107,15 @@
 [INFO]2021/11/03 02:16:44 log_helper.go:54: source file: ./examples/t3.gl
 [INFO]2021/11/03 02:16:56 log_helper.go:54: source file: ./examples/t3.gl
 [INFO]2021/11/03 02:17:46 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:01:16 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:01:50 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:03:15 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:04:36 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:04:59 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:06:41 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 13:09:41 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 21:13:11 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 21:13:42 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 21:14:52 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 21:18:06 log_helper.go:54: source file: ./examples/t3.gl
+[INFO]2021/11/03 21:18:38 log_helper.go:54: source file: ./examples/t3.gl

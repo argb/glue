@@ -125,6 +125,21 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}else {
 			c.emit(code.OpSetLocal, symbol.Index)
 		}
+	case *ast.AssignStatement:
+		symbol, ok := c.symbolTable.Resolve(node.Lhs.Value)
+		if !ok {
+			// 先粗暴处理下错误信息
+			panic(fmt.Sprintf("undefined symbol %s.", node.Lhs.Value))
+		}
+		err := c.Compile(node.Rhs)
+		if err != nil {
+			return err
+		}
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		}else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
 	case *ast.ExpressionStatement:
 		err := c.Compile(node.Expression)
 		if err != nil {

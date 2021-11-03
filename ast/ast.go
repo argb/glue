@@ -563,7 +563,8 @@ func (this *HashLiteral) Tag() string {
 
 type AssignStatement struct {
 	Token token.Token
-	Expressions [] Expression
+	Lhs *Identifier
+	Rhs Expression
 	Id int64
 }
 
@@ -578,10 +579,9 @@ func (as *AssignStatement) TokenLiteral() string {
 func (as *AssignStatement) String() string {
 	var out bytes.Buffer
 
-	for _, exp := range as.Expressions {
-		out.WriteString(exp.String())
-		out.WriteString(", ")
-	}
+	out.WriteString(as.Lhs.String())
+	out.WriteString(" = ")
+	out.WriteString(as.Rhs.String())
 	out.WriteString(";")
 	return out.String()
 }

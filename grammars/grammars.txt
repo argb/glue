@@ -1,101 +1,67 @@
-这门语言的特点：
-1、一切皆为表达式，一切皆可计算
-2、一切类型都是衍生自Object这个超级父类，也就是一切类型皆对象
+
+表达式的解析因为采用了递归下降的算符优先算法，所以表达式相关的产生式规则被大大简化了，
+经典语法书中经常看到的term/factor等描述表达式的规则这里并不需要，不是我漏写了。
+
+以下主要的产生式语法规则
 ========================================================
-
-源程序-->语句-->表达式
-语句是不产生值的，而表达式可以。
-语句 := 表达式;|if 表达式 else 语句块;|等等
-语句的结束标志是分号（；），如果语句的解析开始之后，一直没有读取到分号，则视为非法语句。
-表达式语句（赋值语句）： 标志符 = 表达式;
-表达式语句不产生值，但是其中的表达式可以产生值，并赋值给左侧标志符。
-<params> ::= (<expression list>)
-<arguments> ::= (<expression list>)
-<expression list> ::= <expression>|<expression>,<expression tail>
-<expression tail> ::= <expression>,<expression>...
-<expression> ::= <prefix expression>|<infix expression>
-<prefix expression> ::= <prefix operator><operand>
-<prefix operator> ::= - | ! | ( | [ | { | ε
-这里稍微说明下，只要不是中缀表达式运算符，其他的表达式成分都看做前缀表达式，或者ε(epsilon)运算符,这个ε是我自己引入的一个概念
-主要是因为这里涉及的表达式解析算法TDOP,引入ε这个概念只是为了更好的形式化描述这个算法。
-ε这里代表什么含义呢？
-表示这个运算符是个空操作，不进行实际的运算，直接跟后边的的operand结合。
-再举个栗子，比如下面这两个表达式：
--10，ε10，
-先看第一个-10:
-operator: -
-operand 10
-负号跟数字10发生运算，产生一个结果-10
-而第二个表达式 ε10，
-operator: ε
-operand: 10
-ε这里就是啥也不干，直接取后边的10，解析结果就是10.
-当然实际代码实现中并不会出现ε，只是处理逻辑上相当于有个ε，因为处理逻辑跟-10是用的同一套逻辑，引入这ε只是为了说明这样处理合理性，
-相当于这里有个啥也不干的运算符。
-<operand> ::= Identifier|<kinds of literals>
-<infix expression> ::= <prefix expression><infix operator><expression>
-<infix operator> ::= + | - | * | / | ( | > | < | == | != | = | [
-(, 这里表示函数调用
-[, 数组索引取元素
-这些都看做中缀表达式，或者二元表达式
-可能大家觉得这里为什么跟前缀表达式有重复，确实是有重复，但是不影响解析，因为他们前后有其他约束，也就是他们通常是其它成分的一部分，
-所以可以消除这部分不确定性。
-
-
-<array literal> := [<expression list>]
-
-哈希字面量的定义其实跟<expression list>差不多，只是把其中的分隔符换一下。
-<hash literal> ::= {<hash pair>|<hash pair>,<hash literal tail>}
-<hash literal tail> ::= <hash pair>,<hash pair>,...
-<hash pari> ::= <expression : expression> // key部分可以直接限定为Identifier, <Identifier : expression>
-
-表达式种类：
-字面量表达式->数字，字符串，数组，哈希对象
-数学表达式
-函数调用表达式
-
-语句种类：
-声明语句
-赋值语句
-if语句
-return语句
-do while循环语句
-
-函数字面量:
-fn <parameters> <block statement>
-<parameters> ::= (<parameter one>, <parameter two>, <parameter three>, ...)|空
-
-函数调用表达式：
-<expression>(<comma separated expressions>)
-例子:
-add(1,2)
-add()
-
-if语句:
-if (<expression>) <consequence> else <alternative>
-<consequence> ::= <block statement>
-<alternative> ::= <block statement> | 空
-
-目前存在一些设计问题：
-1、if语句，既是表达式也是语句，双重属性，对求值阶段(evaluate)的逻辑有影响。
-2、parser上挂了一个存储所有语句节点的数组p.statements, 这里也有问题，因为语句是存在嵌套的，
-而这个数组是个拉平了的语句数组，这导致存在重复的ast语句节点，如果试图通过遍历这个数组的方式来
-解析整个源程序的AST，那么所有嵌套在内部的节点都会重复解析。
-
-字符串：
-<sequence of characters>
-
-
-声明语句：
-let <identifier> = <expression>;
-
+程序：
+<program> ::= <statement list>
+语句列表：
+<statement list> ::= <statement>...
+语句：
+<statement> ::= <let statement> | <assign statement> | <return statement> | <if statement> | <expression statement> | <while statement>
+                <block statement> | <function definition statement>
+声明赋值语句（let语句）：
+<let statement> ::= let <identifier> = <expression>
 赋值语句：
-<identifier> = <expression>;
-函数定义语句
-<function definition> ::= fn <identifier>(<parameter list>) <block statement>
+<assign statement> ::= <identifier> = <expression>
+返回语句：
+<return statement> ::= return <expression>
+条件判断语句(if 语句):
+<if statement> ::= if (<expression>) <consequence> else <alternative>
+<consequence> ::= <block statement>
+<alternative> ::= <block statement>
+表达式语句：
+<expression statement> ::= <expression>;
+while 循环语句：
+<while statement> ::= while (expression) <whileBody>
+<whileBody> ::= <block statement>
+语句块：
+<block statement> ::= {<statement list>}
+函数定义语句：
+<function definition statement> ::= <function literal>
+函数字面量：
+<function literal> ::= fn <parameter list> <block statement> | fn <identifier> <parameter list> <block statement>
+<parameter list> ::= (<identifier> | <identifier> <parameter list tail>)
+<parameter list tail> ::= , <parameter list>
 
-todo:
-1、支持三元表达，可通过if表达式改造而来
-2、去掉if表达式，改为if语句
-3、统一规划处理：';'作为语句的结束符，必须。
-表达式后边不跟';'就是单纯的表达式，跟了';'就视为表达式语句。
+表达式：
+<expression> ::=  <prefix expression> | <prefix expression> <infix expression>
+前缀表达式：
+<prefix expression> ::= <prefix operator><expression>|<identifier> | <integer literal> | <string literal> | ...
+中缀表达式
+<infix expression> ::= <infix operator><expression>
+前缀运算符
+<prefix operator> ::= - | !
+中缀运算符
+<infix operator> ::= + | - | * | / | ( | [
+
+标志符：
+<identifier> ::= <identifier token>
+数字字面量：
+<integer literal> ::= <integer token>
+字符串字面量：
+<string literal> ::= <string token>
+布尔值字面量：
+<boolean literal> ::= <boolean token>
+
+数组字面量：
+<array literal> ::= [<expression list>]
+<expression list> ::= [<expression> | <expression> <expression list tail>]
+<expression list tail> ::= , <expression list>
+
+哈希字面量：
+<hash literal> ::= { <hash pair list> }
+<hash pair list> ::= <hash pair> | <hash pair> <hash pair list tail>
+<hash pair tail > ::= ,<hash pair list>
+<hash pair> ::= <identifier>:<expression>

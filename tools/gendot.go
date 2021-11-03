@@ -14,12 +14,16 @@ import (
 var Index int64 = 0
 
 func main() {
+
 	input :=`
 fn sub(x,y){
 	let z=x-y
+	m=3;
 	return z;
 }
-let a=10;
+let a=----888;
+let a= -99;
+let a=-10*3;
 let d=-a+(b+c)*6*-1+add(a,10)/9;
 if(!(a>b)){
 	let x=10;
@@ -31,6 +35,8 @@ return a+b;
 }
 add(3,4)
 `
+
+	//input := `add(3,4)`
 	l := lexer.New(input)
 	p := parser.New(l)
 
@@ -164,6 +170,14 @@ func walk(node ast.Node, lines *[]string) {
 
 		*lines = append(*lines, genEdgeToNode(node, node.Value))
 		walk(node.Value, lines)
+	case *ast.AssignStatement:
+		*lines = append(*lines, genEdgeToNode(node, node.Lhs))
+		walk(node.Lhs, lines)
+
+		*lines = append(*lines, genEdgeToLeaf(node, "="))
+
+		*lines = append(*lines, genEdgeToNode(node, node.Rhs))
+		walk(node.Rhs, lines)
 	case *ast.ReturnStatement:
 		*lines = append(*lines, genEdgeToLeaf(node, "return"))
 

@@ -5,11 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3ce2b3a-6fe8-436b-bf2a-2983379f0a7c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/grammars/grammars.draft.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ast.dot" beforeDir="false" afterPath="$PROJECT_DIR$/ast.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ast.png" beforeDir="false" afterPath="$PROJECT_DIR$/ast.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ast/ast.go" beforeDir="false" afterPath="$PROJECT_DIR$/ast/ast.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compiler/compiler.go" beforeDir="false" afterPath="$PROJECT_DIR$/compiler/compiler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/log/glue.log" beforeDir="false" afterPath="$PROJECT_DIR$/data/log/glue.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/t3.gl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/t3.gl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/glue" beforeDir="false" afterPath="$PROJECT_DIR$/glue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grammars/grammars.txt" beforeDir="false" afterPath="$PROJECT_DIR$/grammars/grammars.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/parser/parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gendot.go" beforeDir="false" afterPath="$PROJECT_DIR$/tools/gendot.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vm/vm.go" beforeDir="false" afterPath="$PROJECT_DIR$/vm/vm.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,10 +59,13 @@
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/grammars" />
     <property name="settings.editor.selected.configurable" value="StringManipulation" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/grammars" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/tools/log" />
     </key>
@@ -149,6 +158,30 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/parser/parser.go</url>
+          <line>401</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/tools/gendot.go</url>
+          <line>173</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/tools/gendot.go</url>
+          <line>159</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/parser/parser.go</url>
+          <line>396</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="p.curToken" language="go" />
